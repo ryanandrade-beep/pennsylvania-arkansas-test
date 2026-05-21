@@ -1,0 +1,25 @@
+{
+  "mode": "testops",
+  "fallback": "report",
+  "testops": {
+    "project": "PA",
+    "api": {
+      "token": "QASE_TOKEN_REMOVIDO_DO_HISTORICO"
+    },
+    "run": {
+      "title": "Automated test - API - run"
+    },
+    "batch": {
+      "size": 100
+    }
+  },
+  "report": {
+    "driver": "local",
+    "connection": {
+      "local": {
+        "path": "./target/qase-report",
+        "format": "json"
+      }
+    }
+  }
+}

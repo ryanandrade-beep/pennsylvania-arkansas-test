@@ -1,0 +1,73 @@
+name: QA Pipeline – Karate – Pennsylvania Arkansas
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      karate_env:
+        description: "Ambiente de execucao (staging | production | local)"
+        required: false
+        default: "staging"
+      karate_tags:
+        description: "Tags para filtrar cenarios (ex: @smoke, @regression)"
+        required: false
+        default: "@regression"
+
+jobs:
+  karate-tests:
+    name: Karate API Tests — Pennsylvania Arkansas
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+          cache: "maven"
+
+      - name: Configurar timezone (America/Sao_Paulo)
+        run: sudo timedatectl set-timezone America/Sao_Paulo 2>/dev/null || true
+
+      - name: Resolver dependencias Maven
+        run: mvn dependency:resolve -q
+
+      - name: Executar testes Karate
+        run: |
+          TAGS="${{ github.event.inputs.karate_tags || '@regression' }}"
+          ENV="${{ github.event.inputs.karate_env || 'staging' }}"
+          mvn test -Dkarate.env=$ENV -Dkarate.options="--tags $TAGS"
+        env:
+          BASE_URL: ${{ secrets.BASE_URL }}
+          CONWAY_ZAPI_URL: ${{ secrets.CONWAY_ZAPI_URL }}
+          CONWAY_TELEGRAM_URL: ${{ secrets.CONWAY_TELEGRAM_URL }}
+          CONWAY_META_URL: ${{ secrets.CONWAY_META_URL }}
+          BARLING_URL: ${{ secrets.BARLING_URL }}
+          NEWPORT_URL: ${{ secrets.NEWPORT_URL }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          PUBLIC_KEY: ${{ secrets.PUBLIC_KEY }}
+          ENTERPRISE_SECRET_KEY: ${{ secrets.ENTERPRISE_SECRET_KEY }}
+          CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
+          ZAPI_CHANNEL_ID: ${{ secrets.ZAPI_CHANNEL_ID }}
+          TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
+          META_CHANNEL_ID: ${{ secrets.META_CHANNEL_ID }}
+          PHONE_NUMBER: ${{ secrets.PHONE_NUMBER }}
+          MESSAGE_ID: ${{ secrets.MESSAGE_ID }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          # Qase TMS
+          QASE_TESTOPS_API_TOKEN: ${{ secrets.QASE_TESTOPS_API_TOKEN }}
+          QASE_TESTOPS_PROJECT: ${{ secrets.QASE_TESTOPS_PROJECT }}
+          QASE_TESTOPS_RUN_TITLE: "Automated test - API - run"
+          QASE_REPORT: "1"
+
+      - name: Publicar relatorio Karate
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: karate-reports
+          path: target/karate-reports/
+          retention-days: 30

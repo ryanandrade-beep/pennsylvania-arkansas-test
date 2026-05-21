@@ -1,0 +1,33 @@
+# Maven
+target/
+*.class
+*.jar
+*.war
+
+# Relatorios Karate
+target/karate-reports/
+target/surefire-reports/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+
+# Variaveis de ambiente — nunca versionar credenciais
+.env
+*.env
+env.properties
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude Code
+.claude/

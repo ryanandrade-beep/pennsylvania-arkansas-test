@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.irrahgroup</groupId>
+    <artifactId>pennsylvania-arkansas-test</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <name>pennsylvania-arkansas-test</name>
+    <description>
+        Testes automatizados de API para os servicos Arkansas (conway, barling, newport)
+        utilizando Karate DSL com integracao ao Qase TMS.
+    </description>
+
+    <properties>
+        <java.version>17</java.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Versoes das dependencias -->
+        <karate.version>1.4.1</karate.version>
+        <junit5.version>5.10.2</junit5.version>
+        <maven-surefire.version>3.2.5</maven-surefire.version>
+        <!-- Execucao paralela -->
+        <karate.threads>5</karate.threads>
+    </properties>
+
+    <dependencies>
+        <!-- Karate Core (inclui JUnit 5 runner integrado) -->
+        <dependency>
+            <groupId>com.intuit.karate</groupId>
+            <artifactId>karate-junit5</artifactId>
+            <version>${karate.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- JUnit 5 -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit5.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- SLF4J para logs do Karate -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>2.0.12</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Qase: integrado via QaseKarateHook (RuntimeHook customizado)
+             Usa java.net.http.HttpClient nativo (Java 11+) — sem dependencia extra -->
+    </dependencies>
+
+    <build>
+        <testSourceDirectory>src/test/java</testSourceDirectory>
+        <testResources>
+            <testResource>
+                <!-- Inclui os .feature files e karate-config.js no classpath -->
+                <directory>src/test/resources</directory>
+            </testResource>
+            <testResource>
+                <!-- Permite que os .feature files sejam encontrados pelo runner -->
+                <directory>src/test/java</directory>
+                <excludes>
+                    <exclude>**/*.java</exclude>
+                </excludes>
+            </testResource>
+        </testResources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire.version}</version>
+                <configuration>
+                    <!-- Inclui apenas a classe principal de runner -->
+                    <includes>
+                        <include>**/TestRunner.java</include>
+                    </includes>
+                    <!-- Variaveis de ambiente e Qase passadas via -D ou env -->
+                    <systemPropertyVariables>
+                        <karate.env>${karate.env}</karate.env>
+                    </systemPropertyVariables>
+                    <argLine>-Dfile.encoding=UTF-8</argLine>
+                    <!-- Repassa variaveis Qase como system properties para o processo forked -->
+                    <systemPropertyVariables>
+                        <QASE_MODE>${QASE_MODE}</QASE_MODE>
+                        <QASE_TESTOPS_API_TOKEN>${QASE_TESTOPS_API_TOKEN}</QASE_TESTOPS_API_TOKEN>
+                        <QASE_TESTOPS_PROJECT>${QASE_TESTOPS_PROJECT}</QASE_TESTOPS_PROJECT>
+                        <QASE_TESTOPS_RUN_ID>${QASE_TESTOPS_RUN_ID}</QASE_TESTOPS_RUN_ID>
+                    </systemPropertyVariables>
+                    <!-- Necessario para JUnit 5 -->
+                    <useModulePath>false</useModulePath>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.12.1</version>
+                <configuration>
+                    <source>17</source>
+                    <target>17</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
