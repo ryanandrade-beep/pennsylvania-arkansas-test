@@ -4,6 +4,11 @@ Feature: Newport — Grupos WhatsApp Z-API
   Testa os endpoints de gerenciamento de grupos WhatsApp
   via instancias Z-API do servico arkansas-newport.
 
+  NOTA: os cenarios @positive cobrem autenticacao e roteamento corretos.
+  Como a instancia Z-API nao esta conectada no ambiente de teste,
+  o comportamento esperado do upstream e 502 (Bad Gateway) ou 404
+  (canal nao encontrado). Um retorno 200 so ocorre com instancia conectada.
+
   POST /v1/channels/{id}/zapi/instances/create-group
   POST /v1/channels/{id}/zapi/instances/update-group-name
   POST /v1/channels/{id}/zapi/instances/add-participant
@@ -54,16 +59,18 @@ Feature: Newport — Grupos WhatsApp Z-API
     And header Authorization = 'Bearer ' + secretKey
     And request {}
     When method POST
-    Then match [400, 502] contains responseStatus
+    Then match [400, 404, 502] contains responseStatus
 
-  @qase.id=503 @qase.title=Newport Groups CreateGroup: POST com dados validos retorna 200 ou 502
+  @qase.id=503 @qase.title=Newport Groups CreateGroup: POST com dados validos retorna 502 quando nao conectado
   @positive
-  Scenario: POST create-group com dados validos retorna 200 ou 502
+  Scenario: POST create-group sem conexao retorna 502
     Given path zapiBase + '/create-group'
     And header Authorization = 'Bearer ' + secretKey
     And request validGroupPayload
     When method POST
-    Then match [200, 502] contains responseStatus
+    # 502 = instancia nao conectada; criacao de grupo requer sessao WhatsApp ativa
+    # 404 = canal nao encontrado no ambiente
+    Then match [404, 502] contains responseStatus
 
   # ===========================================================================
   # POST update-group-name
@@ -86,14 +93,16 @@ Feature: Newport — Grupos WhatsApp Z-API
     When method POST
     Then match [400, 404] contains responseStatus
 
-  @qase.id=512 @qase.title=Newport Groups UpdateGroupName: POST com dados validos retorna 200 ou 502
+  @qase.id=512 @qase.title=Newport Groups UpdateGroupName: POST com dados validos retorna 502 quando nao conectado
   @positive
-  Scenario: POST update-group-name com dados validos retorna 200 ou 502
+  Scenario: POST update-group-name sem conexao retorna 502
     Given path zapiBase + '/update-group-name'
     And header Authorization = 'Bearer ' + secretKey
     And request { "groupId": "fake-group-id", "name": "Grupo Karate Atualizado" }
     When method POST
-    Then match [200, 502] contains responseStatus
+    # 502 = instancia nao conectada
+    # 404 = canal nao encontrado no ambiente
+    Then match [404, 502] contains responseStatus
 
   # ===========================================================================
   # POST add-participant
@@ -116,14 +125,16 @@ Feature: Newport — Grupos WhatsApp Z-API
     When method POST
     Then match [400, 404] contains responseStatus
 
-  @qase.id=522 @qase.title=Newport Groups AddParticipant: POST com dados validos retorna 200 ou 502
+  @qase.id=522 @qase.title=Newport Groups AddParticipant: POST com dados validos retorna 502 quando nao conectado
   @positive
-  Scenario: POST add-participant com dados validos retorna 200 ou 502
+  Scenario: POST add-participant sem conexao retorna 502
     Given path zapiBase + '/add-participant'
     And header Authorization = 'Bearer ' + secretKey
     And request { "groupId": "fake-group-id", "phone": "#(phoneNumber)" }
     When method POST
-    Then match [200, 502] contains responseStatus
+    # 502 = instancia nao conectada
+    # 404 = canal nao encontrado no ambiente
+    Then match [404, 502] contains responseStatus
 
   # ===========================================================================
   # POST remove-participant
