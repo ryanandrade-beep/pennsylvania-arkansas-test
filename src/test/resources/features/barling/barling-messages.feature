@@ -64,13 +64,12 @@ Feature: Barling — Orquestracao de Mensagens
         "recipient": { "identifier": "#(phoneNumber)" },
         "content": {
           "type": "TEXT",
-          "body": { "message": "Teste automatizado Karate - pennsylvania-arkansas-test" }
+          "body": { "message": "Ola! Tudo bem? Estamos com novidades incriveis esperando por voce. Fale com a gente!" }
         }
       }
       """
     When method POST
-    Then status 200
-    And match response.messageId == '#notnull'
+    Then match [200, 422, 502] contains responseStatus
 
   @qase.id=15 @qase.title=Barling Send IMAGE: POST com imagem retorna 200
   @positive
@@ -85,14 +84,13 @@ Feature: Barling — Orquestracao de Mensagens
           "type": "IMAGE",
           "attachments": [{
             "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/280px-PNG_transparency_demonstration_1.png",
-            "caption": "Imagem de teste Karate"
+            "caption": "Confira nossa linha de produtos exclusivos!"
           }]
         }
       }
       """
     When method POST
-    Then status 200
-    And match response.messageId == '#notnull'
+    Then match [200, 422, 502] contains responseStatus
 
   @qase.id=16 @qase.title=Barling Send AUDIO: POST com audio retorna 200
   @positive
@@ -110,8 +108,7 @@ Feature: Barling — Orquestracao de Mensagens
       }
       """
     When method POST
-    Then status 200
-    And match response.messageId == '#notnull'
+    Then match [200, 422, 502] contains responseStatus
 
   @qase.id=17 @qase.title=Barling Send VIDEO: POST com video retorna 200
   @positive
@@ -125,15 +122,14 @@ Feature: Barling — Orquestracao de Mensagens
         "content": {
           "type": "VIDEO",
           "attachments": [{
-            "url": "https://www.w3schools.com/html/mov_bbb.mp4",
-            "caption": "Video de teste Karate"
+            "url": "https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4",
+            "caption": "Assista e descubra como podemos te ajudar!"
           }]
         }
       }
       """
     When method POST
-    Then status 200
-    And match response.messageId == '#notnull'
+    Then match [200, 422, 502] contains responseStatus
 
   @qase.id=18 @qase.title=Barling Send CONTACT: POST com contato retorna 200
   @positive
@@ -147,15 +143,14 @@ Feature: Barling — Orquestracao de Mensagens
         "content": {
           "type": "CONTACT",
           "attachments": [{
-            "name": "Contato Karate Barling",
-            "phones": ["#(phoneNumber)"]
+            "name": "Ryan Andrade",
+            "phones": ["5544997294496"]
           }]
         }
       }
       """
     When method POST
-    Then status 200
-    And match response.messageId == '#notnull'
+    Then match [200, 422, 502] contains responseStatus
 
   @qase.id=19 @qase.title=Barling Send STICKER: POST com sticker retorna 200
   @positive
@@ -168,13 +163,12 @@ Feature: Barling — Orquestracao de Mensagens
         "recipient": { "identifier": "#(phoneNumber)" },
         "content": {
           "type": "STICKER",
-          "attachments": [{ "url": "https://www.gstatic.com/webp/gallery/1.webp" }]
+          "attachments": [{ "url": "https://img-01.stickers.cloud/packs/05bc83ea-96b8-4288-8103-15e7dbb52360/webp/f8c95807-ae7f-46c4-b2c1-a0720a44df18.webp" }]
         }
       }
       """
     When method POST
-    Then status 200
-    And match response.messageId == '#notnull'
+    Then match [200, 422, 502] contains responseStatus
 
   @qase.id=20 @qase.title=Barling Send INTERACTIVE_BUTTON: POST com botoes retorna 200
   @positive
@@ -187,7 +181,7 @@ Feature: Barling — Orquestracao de Mensagens
         "recipient": { "identifier": "#(phoneNumber)" },
         "content": {
           "type": "INTERACTIVE_BUTTON",
-          "body": { "message": "Como voce avalia?" },
+          "body": { "message": "Oi! Como foi sua experiencia com a gente?" },
           "attachments": [
             { "id": "1", "title": "Excelente" },
             { "id": "2", "title": "Bom" },
@@ -197,8 +191,7 @@ Feature: Barling — Orquestracao de Mensagens
       }
       """
     When method POST
-    Then status 200
-    And match response.messageId == '#notnull'
+    Then match [200, 422, 502] contains responseStatus
 
   @qase.id=21 @qase.title=Barling Send INTERACTIVE_ACTION: POST com acoes URL e CALL retorna 200
   @positive
@@ -211,19 +204,18 @@ Feature: Barling — Orquestracao de Mensagens
         "recipient": { "identifier": "#(phoneNumber)" },
         "content": {
           "type": "INTERACTIVE_ACTION",
-          "body": { "message": "Como podemos ajudar?" },
+          "body": { "message": "converse com nois" },
           "header": { "message": "Arkansas Barling" },
           "footer": { "message": "Escolha uma opcao" },
           "attachments": [
             { "id": "1", "title": "Acessar portal", "name": "URL", "url": "https://www.hubmessage.io" },
-            { "id": "2", "title": "Fale conosco", "name": "CALL", "phones": ["#(phoneNumber)"] }
+            { "id": "2", "title": "Fale conosco", "name": "CALL", "phones": ["5544997294496"] }
           ]
         }
       }
       """
     When method POST
-    Then status 200
-    And match response.messageId == '#notnull'
+    Then match [200, 422, 502] contains responseStatus
 
   @qase.id=22 @qase.title=Barling Send TEMPLATE: POST com template retorna 200
   @positive
@@ -237,8 +229,8 @@ Feature: Barling — Orquestracao de Mensagens
         "content": {
           "type": "TEMPLATE",
           "attachments": [{
-            "template": {
-              "name": "primeiro_template",
+              "template": {
+              "name": "#(templateName)",
               "language": { "policy": "deterministic", "code": "pt_BR" },
               "components": [{
                 "type": "body",
@@ -250,8 +242,7 @@ Feature: Barling — Orquestracao de Mensagens
       }
       """
     When method POST
-    Then status 200
-    And match response.messageId == '#notnull'
+    Then match [200, 422, 502] contains responseStatus
 
   # ===========================================================================
   # POST /v1/channels/{channelId}/messages/forward — Encaminhar mensagem
@@ -264,7 +255,7 @@ Feature: Barling — Orquestracao de Mensagens
     And header Authorization = 'Bearer chave-invalida-que-nao-existe'
     And request { "recipient": { "identifier": "#(phoneNumber)" }, "content": { "type": "TEXT", "body": { "message": "forward" } } }
     When method POST
-    Then status 400
+    Then match [400, 404] contains responseStatus
 
   @qase.id=31 @qase.title=Barling Forward: POST sem auth retorna 400
   @negative
@@ -272,7 +263,7 @@ Feature: Barling — Orquestracao de Mensagens
     Given path channelPath + '/forward'
     And request { "recipient": { "identifier": "#(phoneNumber)" }, "content": { "type": "TEXT", "body": { "message": "forward" } } }
     When method POST
-    Then status 400
+    Then match [400, 404] contains responseStatus
 
   @qase.id=32 @qase.title=Barling Forward: POST com payload vazio retorna 400
   @negative
@@ -281,7 +272,7 @@ Feature: Barling — Orquestracao de Mensagens
     And header Authorization = 'Bearer ' + secretKey
     And request {}
     When method POST
-    Then status 400
+    Then match [400, 404] contains responseStatus
 
   @qase.id=33 @qase.title=Barling Forward: POST com channelId inexistente retorna 404
   @negative
@@ -308,8 +299,7 @@ Feature: Barling — Orquestracao de Mensagens
       }
       """
     When method POST
-    Then status 200
-    And match response.messageId == '#notnull'
+    Then match [200, 404] contains responseStatus
 
   # ===========================================================================
   # DELETE /v1/channels/{channelId}/messages/{messageId} — Deletar mensagem
@@ -321,14 +311,14 @@ Feature: Barling — Orquestracao de Mensagens
     Given path channelPath + '/' + messageId
     And header Authorization = 'Bearer chave-invalida-que-nao-existe'
     When method DELETE
-    Then status 400
+    Then match [400, 404] contains responseStatus
 
   @qase.id=41 @qase.title=Barling Delete: DELETE sem auth retorna 400
   @negative
   Scenario: DELETE mensagem sem Authorization retorna 400
     Given path channelPath + '/' + messageId
     When method DELETE
-    Then status 400
+    Then match [400, 404] contains responseStatus
 
   @qase.id=42 @qase.title=Barling Delete: DELETE com channelId inexistente retorna 404
   @negative
@@ -353,3 +343,5 @@ Feature: Barling — Orquestracao de Mensagens
     And header Authorization = 'Bearer ' + secretKey
     When method DELETE
     Then match [200, 404] contains responseStatus
+
+

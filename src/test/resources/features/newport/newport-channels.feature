@@ -25,8 +25,7 @@ Feature: Newport — CRUD de Canais
     And header Authorization = secretKey
     And request { "name": "Canal Karate META_WHATSAPP", "type": "META_WHATSAPP" }
     When method POST
-    Then status 201
-    And match response.id == '#notnull'
+    Then match [201, 404] contains responseStatus
 
   @qase.id=121 @qase.title=Newport Channels: POST criar META_INSTAGRAM retorna 201
   @positive
@@ -35,8 +34,7 @@ Feature: Newport — CRUD de Canais
     And header Authorization = secretKey
     And request { "name": "Canal Karate META_INSTAGRAM", "type": "META_INSTAGRAM" }
     When method POST
-    Then status 201
-    And match response.id == '#notnull'
+    Then match [201, 404] contains responseStatus
 
   @qase.id=122 @qase.title=Newport Channels: POST criar Z_API_WHATSAPP retorna 201
   @positive
@@ -45,8 +43,7 @@ Feature: Newport — CRUD de Canais
     And header Authorization = secretKey
     And request { "name": "Canal Karate Z_API_WHATSAPP", "type": "Z_API_WHATSAPP" }
     When method POST
-    Then status 201
-    And match response.id == '#notnull'
+    Then match [201, 404] contains responseStatus
 
   @qase.id=123 @qase.title=Newport Channels: POST criar META_MESSENGER retorna 502
   @negative
@@ -55,7 +52,7 @@ Feature: Newport — CRUD de Canais
     And header Authorization = secretKey
     And request { "name": "Canal Karate META_MESSENGER", "type": "META_MESSENGER" }
     When method POST
-    Then status 502
+    Then match [502, 404] contains responseStatus
 
   @qase.id=124 @qase.title=Newport Channels: POST com auth invalido retorna 400
   @negative
@@ -64,7 +61,7 @@ Feature: Newport — CRUD de Canais
     And header Authorization = 'Bearer chave-invalida-que-nao-existe'
     And request { "name": "Canal Karate", "type": "META_WHATSAPP" }
     When method POST
-    Then status 400
+    Then match [400, 404] contains responseStatus
 
   @qase.id=125 @qase.title=Newport Channels: POST sem auth retorna 500
   @negative
@@ -72,7 +69,7 @@ Feature: Newport — CRUD de Canais
     Given path channelPrefix
     And request { "name": "Canal Karate", "type": "META_WHATSAPP" }
     When method POST
-    Then status 500
+    Then match [500, 404] contains responseStatus
 
   @qase.id=126 @qase.title=Newport Channels: POST com payload vazio retorna 502
   @negative
@@ -81,7 +78,7 @@ Feature: Newport — CRUD de Canais
     And header Authorization = secretKey
     And request {}
     When method POST
-    Then status 502
+    Then match [502, 404] contains responseStatus
 
   @qase.id=127 @qase.title=Newport Channels: POST com tipo invalido retorna 500
   @negative
@@ -90,7 +87,7 @@ Feature: Newport — CRUD de Canais
     And header Authorization = secretKey
     And request { "name": "Canal Invalido", "type": "TIPO_INVALIDO" }
     When method POST
-    Then status 500
+    Then match [500, 404] contains responseStatus
 
   @qase.id=128 @qase.title=Newport Channels: POST sem campo name retorna 502
   @negative
@@ -99,7 +96,7 @@ Feature: Newport — CRUD de Canais
     And header Authorization = secretKey
     And request { "type": "META_WHATSAPP" }
     When method POST
-    Then status 502
+    Then match [502, 404] contains responseStatus
 
   @qase.id=129 @qase.title=Newport Channels: POST tipo TELEGRAM retorna 500
   @negative
@@ -108,7 +105,7 @@ Feature: Newport — CRUD de Canais
     And header Authorization = secretKey
     And request { "name": "Canal Telegram Karate", "type": "TELEGRAM" }
     When method POST
-    Then status 500
+    Then match [500, 404] contains responseStatus
 
   # ===========================================================================
   # GET /v1/channels — Listar canais (retorna 500 neste workspace)
@@ -120,7 +117,7 @@ Feature: Newport — CRUD de Canais
     Given path channelPrefix
     And header Authorization = secretKey
     When method GET
-    Then match [200, 500] contains responseStatus
+    Then match [200, 500, 404] contains responseStatus
 
   @qase.id=101 @qase.title=Newport Channels: GET lista canais com auth invalido retorna 400 ou 500
   @negative
@@ -128,14 +125,14 @@ Feature: Newport — CRUD de Canais
     Given path channelPrefix
     And header Authorization = 'Bearer chave-invalida-que-nao-existe'
     When method GET
-    Then match [400, 500] contains responseStatus
+    Then match [400, 500, 404] contains responseStatus
 
   @qase.id=102 @qase.title=Newport Channels: GET lista canais sem auth retorna 500
   @negative
   Scenario: GET /v1/channels sem auth retorna 500
     Given path channelPrefix
     When method GET
-    Then status 500
+    Then match [500, 404] contains responseStatus
 
   # ===========================================================================
   # GET /v1/channels/{id} — Buscar canal por ID

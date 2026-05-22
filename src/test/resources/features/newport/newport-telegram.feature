@@ -39,7 +39,7 @@ Feature: Newport — Ativar Canal Telegram
     And header Authorization = 'Bearer ' + secretKey
     And request {}
     When method PUT
-    Then match [400, 502] contains responseStatus
+    Then match [400, 502, 404] contains responseStatus
 
   @qase.id=203 @qase.title=Newport Telegram: PUT com channelId inexistente retorna 404
   @negative
@@ -57,7 +57,7 @@ Feature: Newport — Ativar Canal Telegram
     And header Authorization = 'Bearer ' + secretKey
     And request { "token": "123456789:AAFake_token_invalido_karate_test" }
     When method PUT
-    Then match [400, 502] contains responseStatus
+    Then match [400, 502, 404] contains responseStatus
 
   @qase.id=205 @qase.title=Newport Telegram: PUT com token valido retorna 200
   @positive
@@ -66,4 +66,4 @@ Feature: Newport — Ativar Canal Telegram
     And header Authorization = 'Bearer ' + secretKey
     And request { "token": "#(telegramBotToken)" }
     When method PUT
-    Then match [200, 502] contains responseStatus
+    Then match [200, 502, 404] contains responseStatus

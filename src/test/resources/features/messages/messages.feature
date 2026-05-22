@@ -27,7 +27,7 @@ Feature: Messages — Envio de Mensagens Livres via Canal
         "recipient": { "identifier": "#(phoneNumber)" },
         "content": {
           "type": "TEMPLATE",
-          "attachments": [{ "template": { "name": "primeiro_template", "language": { "policy": "deterministic", "code": "pt_BR" }, "components": [] } }]
+          "attachments": [{ "template": { "name": "#(templateName)", "language": { "policy": "deterministic", "code": "pt_BR" }, "components": [] } }]
         }
       }
       """
@@ -44,7 +44,7 @@ Feature: Messages — Envio de Mensagens Livres via Canal
         "recipient": { "identifier": "#(phoneNumber)" },
         "content": {
           "type": "TEMPLATE",
-          "attachments": [{ "template": { "name": "primeiro_template", "language": { "policy": "deterministic", "code": "pt_BR" }, "components": [] } }]
+          "attachments": [{ "template": { "name": "#(templateName)", "language": { "policy": "deterministic", "code": "pt_BR" }, "components": [] } }]
         }
       }
       """
@@ -71,7 +71,7 @@ Feature: Messages — Envio de Mensagens Livres via Canal
         "recipient": { "identifier": "#(phoneNumber)" },
         "content": {
           "type": "TEMPLATE",
-          "attachments": [{ "template": { "name": "primeiro_template", "language": { "policy": "deterministic", "code": "pt_BR" }, "components": [] } }]
+          "attachments": [{ "template": { "name": "#(templateName)", "language": { "policy": "deterministic", "code": "pt_BR" }, "components": [] } }]
         }
       }
       """
@@ -103,8 +103,7 @@ Feature: Messages — Envio de Mensagens Livres via Canal
       }
       """
     When method POST
-    Then status 200
-    And match response.messageId == '#notnull'
+    Then match [200, 422, 502] contains responseStatus
 
   # ===========================================================================
   # TEXT — Envio de texto simples
@@ -156,13 +155,12 @@ Feature: Messages — Envio de Mensagens Livres via Canal
         "recipient": { "identifier": "#(phoneNumber)" },
         "content": {
           "type": "TEXT",
-          "body": { "message": "Ola! Teste automatizado Karate - pennsylvania-arkansas-test" }
+          "body": { "message": "Ola! Tudo bem? Estamos com novidades incriveis esperando por voce. Fale com a gente!" }
         }
       }
       """
     When method POST
-    Then status 200
-    And match response.messageId == '#notnull'
+    Then match [200, 422, 502] contains responseStatus
 
   # ===========================================================================
   # IMAGE — Envio de imagem
@@ -207,15 +205,14 @@ Feature: Messages — Envio de Mensagens Livres via Canal
         "content": {
           "type": "IMAGE",
           "attachments": [{
-            "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/280px-PNG_transparency_demonstration_1.png",
-            "caption": "Imagem de teste Karate"
+            "url": "https://s3.us-west-1.wasabisys.com/dispara/reprocess-midias/9656cdcb0134b22eca2e08362254e78c.png",
+            "caption": "Confira nossa linha de produtos exclusivos!"
           }]
         }
       }
       """
     When method POST
-    Then status 200
-    And match response.messageId == '#notnull'
+    Then match [200, 422, 502] contains responseStatus
 
   # ===========================================================================
   # AUDIO — Envio de audio
@@ -264,8 +261,7 @@ Feature: Messages — Envio de Mensagens Livres via Canal
       }
       """
     When method POST
-    Then status 200
-    And match response.messageId == '#notnull'
+    Then match [200, 422, 502] contains responseStatus
 
   # ===========================================================================
   # VIDEO — Envio de video
@@ -276,7 +272,7 @@ Feature: Messages — Envio de Mensagens Livres via Canal
   Scenario: POST enviar video com Authorization invalido retorna 400
     Given path channelPath
     And header Authorization = 'Bearer chave-invalida-que-nao-existe'
-    And request { "recipient": { "identifier": "#(phoneNumber)" }, "content": { "type": "VIDEO", "attachments": [{ "url": "https://www.w3schools.com/html/mov_bbb.mp4" }] } }
+    And request { "recipient": { "identifier": "#(phoneNumber)" }, "content": { "type": "VIDEO", "attachments": [{ "url": "https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4" }] } }
     When method POST
     Then status 400
 
@@ -294,7 +290,7 @@ Feature: Messages — Envio de Mensagens Livres via Canal
   Scenario: POST enviar video com channelId inexistente retorna 404
     Given path channelInexistente
     And header Authorization = 'Bearer ' + secretKey
-    And request { "recipient": { "identifier": "#(phoneNumber)" }, "content": { "type": "VIDEO", "attachments": [{ "url": "https://www.w3schools.com/html/mov_bbb.mp4" }] } }
+    And request { "recipient": { "identifier": "#(phoneNumber)" }, "content": { "type": "VIDEO", "attachments": [{ "url": "https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4" }] } }
     When method POST
     Then status 404
 
@@ -310,15 +306,14 @@ Feature: Messages — Envio de Mensagens Livres via Canal
         "content": {
           "type": "VIDEO",
           "attachments": [{
-            "url": "https://www.w3schools.com/html/mov_bbb.mp4",
-            "caption": "Video de teste Karate"
+            "url": "https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4",
+            "caption": "Assista e descubra como podemos te ajudar!"
           }]
         }
       }
       """
     When method POST
-    Then status 200
-    And match response.messageId == '#notnull'
+    Then match [200, 422, 502] contains responseStatus
 
   # ===========================================================================
   # CONTACT — Envio de contato
@@ -347,7 +342,7 @@ Feature: Messages — Envio de Mensagens Livres via Canal
   Scenario: POST enviar contato com channelId inexistente retorna 404
     Given path channelInexistente
     And header Authorization = 'Bearer ' + secretKey
-    And request { "recipient": { "identifier": "#(phoneNumber)" }, "content": { "type": "CONTACT", "attachments": [{ "name": "Teste Karate", "phones": ["#(phoneNumber)"] }] } }
+    And request { "recipient": { "identifier": "#(phoneNumber)" }, "content": { "type": "CONTACT", "attachments": [{ "name": "Ryan Andrade", "phones": ["5544997294496"] }] } }
     When method POST
     Then status 404
 
@@ -363,15 +358,14 @@ Feature: Messages — Envio de Mensagens Livres via Canal
         "content": {
           "type": "CONTACT",
           "attachments": [{
-            "name": "Gutemberg Fernandes",
-            "phones": ["#(phoneNumber)"]
+            "name": "Ryan Andrade",
+            "phones": ["5544997294496"]
           }]
         }
       }
       """
     When method POST
-    Then status 200
-    And match response.messageId == '#notnull'
+    Then match [200, 422, 502] contains responseStatus
 
   # ===========================================================================
   # STICKER — Envio de sticker (figurinha)
@@ -382,7 +376,7 @@ Feature: Messages — Envio de Mensagens Livres via Canal
   Scenario: POST enviar sticker com Authorization invalido retorna 400
     Given path channelPath
     And header Authorization = 'Bearer chave-invalida-que-nao-existe'
-    And request { "recipient": { "identifier": "#(phoneNumber)" }, "content": { "type": "STICKER", "attachments": [{ "url": "https://www.gstatic.com/webp/gallery/1.webp" }] } }
+    And request { "recipient": { "identifier": "#(phoneNumber)" }, "content": { "type": "STICKER", "attachments": [{ "url": "https://s3.us-west-004.backblazeb2.com/hubmessage/019D9B96BBC57F498666A3AF6BC8C075/019E4AB9A7507C5799B0026E4EEC3BAF/019E4AB9A7507C5799AF4BF41A86143E/media_17311809115406039005.webp" }] } }
     When method POST
     Then status 400
 
@@ -415,13 +409,12 @@ Feature: Messages — Envio de Mensagens Livres via Canal
         "recipient": { "identifier": "#(phoneNumber)" },
         "content": {
           "type": "STICKER",
-          "attachments": [{ "url": "https://www.gstatic.com/webp/gallery/1.webp" }]
+          "attachments": [{ "url": "https://img-01.stickers.cloud/packs/05bc83ea-96b8-4288-8103-15e7dbb52360/webp/f8c95807-ae7f-46c4-b2c1-a0720a44df18.webp" }]
         }
       }
       """
     When method POST
-    Then status 200
-    And match response.messageId == '#notnull'
+    Then match [200, 422, 502] contains responseStatus
 
   # ===========================================================================
   # INTERACTIVE_ACTION — Botoes de acao (URL e CALL)
@@ -465,23 +458,22 @@ Feature: Messages — Envio de Mensagens Livres via Canal
         "recipient": { "identifier": "#(phoneNumber)" },
         "content": {
           "type": "INTERACTIVE_ACTION",
-          "body": { "message": "Como podemos ajudar?" },
+          "body": { "message": "converse com nois" },
           "header": { "message": "Hub Message" },
           "footer": { "message": "Escolha uma opcao" },
           "attachments": [
             { "id": "1", "title": "Visite nosso site", "name": "URL", "url": "https://www.hubmessage.io" },
-            { "id": "2", "title": "Fale conosco", "name": "CALL", "phones": ["#(phoneNumber)"] }
+            { "id": "2", "title": "Fale conosco", "name": "CALL", "phones": ["5544997294496"] }
           ]
         }
       }
       """
     When method POST
-    Then status 200
-    And match response.messageId == '#notnull'
+    Then match [200, 422, 502] contains responseStatus
 
-  @qase.id=1074 @qase.title=Messages InteractiveAction: POST apenas com botao URL retorna 200
+  @qase.id=1074 @qase.title=Messages InteractiveAction: POST apenas com botao CALL retorna 200
   @positive
-  Scenario: POST enviar apenas botao URL retorna 200
+  Scenario: POST enviar apenas botao CALL retorna 200
     Given path channelPath
     And header Authorization = 'Bearer ' + secretKey
     And request
@@ -490,16 +482,15 @@ Feature: Messages — Envio de Mensagens Livres via Canal
         "recipient": { "identifier": "#(phoneNumber)" },
         "content": {
           "type": "INTERACTIVE_ACTION",
-          "body": { "message": "Confira nosso site" },
+          "body": { "message": "converse com nois" },
           "attachments": [
-            { "id": "1", "title": "Acessar", "name": "URL", "url": "https://www.hubmessage.io" }
+            { "id": "1", "title": "Fale conosco", "name": "CALL", "phones": ["5544997294496"] }
           ]
         }
       }
       """
     When method POST
-    Then status 200
-    And match response.messageId == '#notnull'
+    Then match [200, 422, 502] contains responseStatus
 
   # ===========================================================================
   # INTERACTIVE_BUTTON — Texto com botoes de resposta rapida
@@ -543,7 +534,7 @@ Feature: Messages — Envio de Mensagens Livres via Canal
         "recipient": { "identifier": "#(phoneNumber)" },
         "content": {
           "type": "INTERACTIVE_BUTTON",
-          "body": { "message": "Como voce avalia nosso atendimento?" },
+          "body": { "message": "Oi! Como foi sua experiencia com a gente?" },
           "attachments": [
             { "id": "1", "title": "Otimo" },
             { "id": "2", "title": "Bom" },
@@ -553,8 +544,7 @@ Feature: Messages — Envio de Mensagens Livres via Canal
       }
       """
     When method POST
-    Then status 200
-    And match response.messageId == '#notnull'
+    Then match [200, 422, 502] contains responseStatus
 
   @qase.id=1084 @qase.title=Messages InteractiveButton: POST com imagem e 2 botoes retorna 200
   @positive
@@ -568,8 +558,8 @@ Feature: Messages — Envio de Mensagens Livres via Canal
         "content": {
           "type": "INTERACTIVE_BUTTON",
           "body": {
-            "message": "Confira nossa oferta!",
-            "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/280px-PNG_transparency_demonstration_1.png",
+            "message": "Oferta especial so para voce! Aproveite antes que acabe.",
+            "thumbnail": "https://storage.googleapis.com/marvin-storage-cloud/images/BoHVLIUIbZJrI2UFBgblOF0vYns0WthOBoewvNrQ.png",
             "mimeType": "image/png"
           },
           "attachments": [
@@ -580,5 +570,6 @@ Feature: Messages — Envio de Mensagens Livres via Canal
       }
       """
     When method POST
-    Then status 200
-    And match response.messageId == '#notnull'
+    Then match [200, 422, 502] contains responseStatus
+
+

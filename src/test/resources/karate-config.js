@@ -34,17 +34,25 @@ function fn() {
   var publicKey           = envOrDefault('PUBLIC_KEY',            'pk_live_CONFIGURE_NO_ENV');
   var enterpriseSecretKey = envOrDefault('ENTERPRISE_SECRET_KEY', secretKey);
 
+  // ── Credenciais Meta / WhatsApp ─────────────────────────────────────────────
+  var metaToken  = envOrDefault('META_TOKEN',  'CONFIGURE_NO_ENV');
+  var catalogId  = envOrDefault('CATALOG_ID',  'CONFIGURE_NO_ENV');
+
   // ── IDs de recursos ──────────────────────────────────────────────────────────
   var channelId         = envOrDefault('CHANNEL_ID',          'CONFIGURE_NO_ENV');
   var zapiChannelId     = envOrDefault('ZAPI_CHANNEL_ID',     channelId);
   var telegramChannelId = envOrDefault('TELEGRAM_CHANNEL_ID', channelId);
   var metaChannelId     = envOrDefault('META_CHANNEL_ID',     channelId);
+  var trialChannelId    = envOrDefault('TRIAL_CHANNEL_ID',    channelId);
   var phoneNumber       = envOrDefault('PHONE_NUMBER',        '5511999999999');
   var messageId         = envOrDefault('MESSAGE_ID',          'CONFIGURE_NO_ENV');
   var telegramBotToken  = envOrDefault('TELEGRAM_BOT_TOKEN',  'CONFIGURE_NO_ENV');
   var businessId        = envOrDefault('BUSINESS_ID',         'CONFIGURE_NO_ENV');
   var templateId        = envOrDefault('TEMPLATE_ID',         'CONFIGURE_NO_ENV');
-  var templateName      = envOrDefault('TEMPLATE_NAME',       'primeiro_template');
+  var templateName      = envOrDefault('TEMPLATE_NAME',       'teste_1');
+
+  // ── Variaveis derivadas ──────────────────────────────────────────────────────
+  var bearerSecretKey = 'Bearer ' + secretKey;
 
   // ── Configuração global do Karate ────────────────────────────────────────────
   var config = {
@@ -62,12 +70,18 @@ function fn() {
     secretKey:            secretKey,
     publicKey:            publicKey,
     enterpriseSecretKey:  enterpriseSecretKey,
+    bearerSecretKey:      bearerSecretKey,
+
+    // Credenciais Meta / WhatsApp
+    metaToken:            metaToken,
+    catalogId:            catalogId,
 
     // IDs de recursos
     channelId:            channelId,
     zapiChannelId:        zapiChannelId,
     telegramChannelId:    telegramChannelId,
     metaChannelId:        metaChannelId,
+    trialChannelId:       trialChannelId,
     phoneNumber:          phoneNumber,
     messageId:            messageId,
     telegramBotToken:     telegramBotToken,
