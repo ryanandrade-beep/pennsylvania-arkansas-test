@@ -21,6 +21,9 @@ target/surefire-reports/
 *.env
 env.properties
 
+# Configuracoes com tokens sensiveis — use qase.config.json.template como referencia
+qase.config.json
+
 # Logs
 logs/
 *.log

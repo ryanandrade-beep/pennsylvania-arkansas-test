@@ -4,7 +4,7 @@
   "testops": {
     "project": "PA",
     "api": {
-      "token": "QASE_TOKEN_REMOVIDO_DO_HISTORICO"
+      "token": "SEU_QASE_TOKEN_AQUI"
     },
     "run": {
       "title": "Automated test - API - run"
