@@ -58,6 +58,12 @@ jobs:
           PHONE_NUMBER: ${{ secrets.PHONE_NUMBER }}
           MESSAGE_ID: ${{ secrets.MESSAGE_ID }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          # Meta / WhatsApp
+          META_TOKEN: ${{ secrets.META_TOKEN }}
+          CATALOG_ID: ${{ secrets.CATALOG_ID }}
+          BUSINESS_ID: ${{ secrets.BUSINESS_ID }}
+          TEMPLATE_ID: ${{ secrets.TEMPLATE_ID }}
+          TEMPLATE_NAME: ${{ secrets.TEMPLATE_NAME }}
           # Qase TMS
           QASE_TESTOPS_API_TOKEN: ${{ secrets.QASE_TESTOPS_API_TOKEN }}
           QASE_TESTOPS_PROJECT: ${{ secrets.QASE_TESTOPS_PROJECT }}
