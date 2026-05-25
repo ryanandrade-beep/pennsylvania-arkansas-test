@@ -18,56 +18,64 @@ Feature: Newport — CRUD de Canais
   # POST /v1/channels — Criar canal
   # ===========================================================================
 
-  @qase.id=120 @qase.title=Newport Channels: POST criar META_WHATSAPP retorna 201
+  @qase.id=120 @qase.title=Newport Channels: POST criar META_WHATSAPP retorna 201 com id
   @positive @smoke
-  Scenario: POST /v1/channels cria canal META_WHATSAPP e retorna 201
+  Scenario: POST /v1/channels cria canal META_WHATSAPP retorna 201 e id do canal
+    * def channelName = 'karate-meta-whatsapp-' + karateSuffix
     Given path channelPrefix
     And header Authorization = secretKey
-    And request { "name": "Canal Karate META_WHATSAPP", "type": "META_WHATSAPP" }
+    And request { name: '#(channelName)', type: 'META_WHATSAPP' }
     When method POST
     Then match [201, 404] contains responseStatus
+    * if (responseStatus == 201) karate.match(response.id, '#notnull')
 
   @qase.id=121 @qase.title=Newport Channels: POST criar META_INSTAGRAM retorna 201
   @positive
   Scenario: POST /v1/channels cria canal META_INSTAGRAM e retorna 201
+    * def channelName = 'karate-meta-instagram-' + karateSuffix
     Given path channelPrefix
     And header Authorization = secretKey
-    And request { "name": "Canal Karate META_INSTAGRAM", "type": "META_INSTAGRAM" }
+    And request { name: '#(channelName)', type: 'META_INSTAGRAM' }
     When method POST
     Then match [201, 404] contains responseStatus
 
-  @qase.id=122 @qase.title=Newport Channels: POST criar Z_API_WHATSAPP retorna 201
+  @qase.id=122 @qase.title=Newport Channels: POST criar ZAPI_WHATSAPP retorna 201 com id
   @positive
-  Scenario: POST /v1/channels cria canal Z_API_WHATSAPP e retorna 201
+  Scenario: POST /v1/channels cria canal ZAPI_WHATSAPP retorna 201 e id do canal
+    * def channelName = 'karate-zapi-whatsapp-' + karateSuffix
     Given path channelPrefix
     And header Authorization = secretKey
-    And request { "name": "Canal Karate Z_API_WHATSAPP", "type": "Z_API_WHATSAPP" }
+    And request { name: '#(channelName)', type: 'ZAPI_WHATSAPP' }
     When method POST
     Then match [201, 404] contains responseStatus
+    * if (responseStatus == 201) karate.match(response.id, '#notnull')
 
   @qase.id=123 @qase.title=Newport Channels: POST criar META_MESSENGER retorna 502
   @negative
   Scenario: POST /v1/channels com META_MESSENGER retorna 502 (provider indisponivel)
+    * def channelName = 'karate-meta-messenger-' + karateSuffix
     Given path channelPrefix
     And header Authorization = secretKey
-    And request { "name": "Canal Karate META_MESSENGER", "type": "META_MESSENGER" }
+    And request { name: '#(channelName)', type: 'META_MESSENGER' }
     When method POST
     Then match [502, 404] contains responseStatus
 
   @qase.id=124 @qase.title=Newport Channels: POST com auth invalido retorna 400
   @negative
   Scenario: POST /v1/channels com auth invalido retorna 400
+    * def channelName = 'karate-auth-invalido-' + karateSuffix
     Given path channelPrefix
     And header Authorization = 'Bearer chave-invalida-que-nao-existe'
-    And request { "name": "Canal Karate", "type": "META_WHATSAPP" }
+    And request { name: '#(channelName)', type: 'META_WHATSAPP' }
     When method POST
     Then match [400, 404] contains responseStatus
 
   @qase.id=125 @qase.title=Newport Channels: POST sem auth retorna 500
   @negative
   Scenario: POST /v1/channels sem auth retorna 500
+    * def channelName = 'karate-sem-auth-' + karateSuffix
     Given path channelPrefix
-    And request { "name": "Canal Karate", "type": "META_WHATSAPP" }
+    And request { name: '#(channelName)', type: 'META_WHATSAPP' }
     When method POST
     Then match [500, 404] contains responseStatus
 
@@ -83,9 +91,10 @@ Feature: Newport — CRUD de Canais
   @qase.id=127 @qase.title=Newport Channels: POST com tipo invalido retorna 500
   @negative
   Scenario: POST /v1/channels com tipo invalido retorna 500
+    * def channelName = 'karate-tipo-invalido-' + karateSuffix
     Given path channelPrefix
     And header Authorization = secretKey
-    And request { "name": "Canal Invalido", "type": "TIPO_INVALIDO" }
+    And request { name: '#(channelName)', type: 'TIPO_INVALIDO' }
     When method POST
     Then match [500, 404] contains responseStatus
 
@@ -94,16 +103,17 @@ Feature: Newport — CRUD de Canais
   Scenario: POST /v1/channels sem campo name retorna 502
     Given path channelPrefix
     And header Authorization = secretKey
-    And request { "type": "META_WHATSAPP" }
+    And request { type: 'META_WHATSAPP' }
     When method POST
     Then match [502, 404] contains responseStatus
 
   @qase.id=129 @qase.title=Newport Channels: POST tipo TELEGRAM retorna 500
   @negative
   Scenario: POST /v1/channels com TELEGRAM retorna 500
+    * def channelName = 'karate-telegram-' + karateSuffix
     Given path channelPrefix
     And header Authorization = secretKey
-    And request { "name": "Canal Telegram Karate", "type": "TELEGRAM" }
+    And request { name: '#(channelName)', type: 'TELEGRAM' }
     When method POST
     Then match [500, 404] contains responseStatus
 
@@ -176,18 +186,20 @@ Feature: Newport — CRUD de Canais
   @qase.id=130 @qase.title=Newport Channels: PUT atualizar canal retorna 200 ou 404
   @positive @smoke
   Scenario: PUT /v1/channels/{id} atualiza nome do canal
+    * def channelName = 'karate-atualizado-' + karateSuffix
     Given path channelPrefix + '/' + channelId
     And header Authorization = secretKey
-    And request { "name": "Canal Karate Atualizado" }
+    And request { name: '#(channelName)' }
     When method PUT
     Then match [200, 404] contains responseStatus
 
   @qase.id=131 @qase.title=Newport Channels: PUT com ID inexistente retorna 404
   @negative
   Scenario: PUT /v1/channels/{id} com ID inexistente retorna 404
+    * def channelName = 'karate-inexistente-' + karateSuffix
     Given path channelPrefix + '/' + idInexistente
     And header Authorization = secretKey
-    And request { "name": "Canal Inexistente" }
+    And request { name: '#(channelName)' }
     When method PUT
     Then status 404
 
@@ -196,7 +208,7 @@ Feature: Newport — CRUD de Canais
   Scenario: PUT /v1/channels/{id} com auth invalido retorna 400 ou 404
     Given path channelPrefix + '/' + channelId
     And header Authorization = 'Bearer chave-invalida-que-nao-existe'
-    And request { "name": "Update" }
+    And request { name: 'karate-update' }
     When method PUT
     Then match [400, 404] contains responseStatus
 
@@ -204,7 +216,7 @@ Feature: Newport — CRUD de Canais
   @negative
   Scenario: PUT /v1/channels/{id} sem auth retorna 404 ou 500
     Given path channelPrefix + '/' + channelId
-    And request { "name": "Update" }
+    And request { name: 'karate-update' }
     When method PUT
     Then match [404, 500] contains responseStatus
 

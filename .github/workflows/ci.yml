@@ -36,11 +36,43 @@ jobs:
       - name: Resolver dependencias Maven
         run: mvn dependency:resolve -q
 
+      - name: Criar run no Qase TMS
+        id: qase_run
+        run: |
+          TAGS="${{ github.event.inputs.karate_tags || '@regression' }}"
+          ENV="${{ github.event.inputs.karate_env || 'staging' }}"
+          RUN_TITLE="[CI] Automated test - API - ${ENV} - $(date '+%d-%m-%Y %H:%M:%S')"
+          PROJECT="${{ secrets.QASE_TESTOPS_PROJECT }}"
+          TOKEN="${{ secrets.QASE_TESTOPS_API_TOKEN }}"
+
+          CREATE_RESPONSE=$(curl -sS --request POST \
+            --url "https://api.qase.io/v1/run/${PROJECT}" \
+            --header "Token: ${TOKEN}" \
+            --header "Content-Type: application/json" \
+            --data "{\"title\":\"${RUN_TITLE}\",\"is_autotest\":true}")
+
+          RUN_ID=$(echo "$CREATE_RESPONSE" | grep -o '"id":[0-9]*' | head -1 | grep -o '[0-9]*')
+
+          if [ -z "$RUN_ID" ]; then
+            echo "ERRO: nao foi possivel criar o run no Qase."
+            echo "Resposta: $CREATE_RESPONSE"
+            exit 1
+          fi
+
+          echo "Run criado — ID: $RUN_ID"
+          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+
       - name: Executar testes Karate
         run: |
           TAGS="${{ github.event.inputs.karate_tags || '@regression' }}"
           ENV="${{ github.event.inputs.karate_env || 'staging' }}"
-          mvn test -Dkarate.env=$ENV -Dkarate.options="--tags $TAGS"
+          mvn test \
+            -Dkarate.env=$ENV \
+            -Dkarate.options="--tags $TAGS" \
+            -DQASE_MODE=testops \
+            -DQASE_TESTOPS_API_TOKEN="${{ secrets.QASE_TESTOPS_API_TOKEN }}" \
+            -DQASE_TESTOPS_PROJECT="${{ secrets.QASE_TESTOPS_PROJECT }}" \
+            -DQASE_TESTOPS_RUN_ID="${{ steps.qase_run.outputs.run_id }}"
         env:
           BASE_URL: ${{ secrets.BASE_URL }}
           CONWAY_ZAPI_URL: ${{ secrets.CONWAY_ZAPI_URL }}
@@ -68,11 +100,15 @@ jobs:
           # Usuarios de administracao (apenas Ryan e Parceiro teste)
           ADMIN_USER_ID_RYAN: ${{ secrets.ADMIN_USER_ID_RYAN }}
           ADMIN_USER_ID_PARCEIRO: ${{ secrets.ADMIN_USER_ID_PARCEIRO }}
-          # Qase TMS
-          QASE_TESTOPS_API_TOKEN: ${{ secrets.QASE_TESTOPS_API_TOKEN }}
-          QASE_TESTOPS_PROJECT: ${{ secrets.QASE_TESTOPS_PROJECT }}
-          QASE_TESTOPS_RUN_TITLE: "Automated test - API - run"
-          QASE_REPORT: "1"
+
+      - name: Fechar run no Qase TMS
+        if: always() && steps.qase_run.outputs.run_id != ''
+        run: |
+          curl -sS --request POST \
+            --url "https://api.qase.io/v1/run/${{ secrets.QASE_TESTOPS_PROJECT }}/${{ steps.qase_run.outputs.run_id }}/complete" \
+            --header "Token: ${{ secrets.QASE_TESTOPS_API_TOKEN }}" \
+            --header "accept: application/json" > /dev/null
+          echo "Run ${{ steps.qase_run.outputs.run_id }} fechado no Qase."
 
       - name: Publicar relatorio Karate
         uses: actions/upload-artifact@v4
