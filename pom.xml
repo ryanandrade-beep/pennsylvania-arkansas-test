@@ -84,13 +84,13 @@
                     <includes>
                         <include>**/TestRunner.java</include>
                     </includes>
-                    <!-- Variaveis de ambiente e Qase passadas via -D ou env -->
+                    <argLine>-Dfile.encoding=UTF-8</argLine>
+                    <!-- System properties repassadas ao processo forked do Surefire.
+                         Variaveis Qase e karate.env sao passadas via -D na linha de comando
+                         (ex: mvn test -DQASE_MODE=testops -DQASE_TESTOPS_RUN_ID=123).
+                         O bloco abaixo garante que elas chegam ao processo forked. -->
                     <systemPropertyVariables>
                         <karate.env>${karate.env}</karate.env>
-                    </systemPropertyVariables>
-                    <argLine>-Dfile.encoding=UTF-8</argLine>
-                    <!-- Repassa variaveis Qase como system properties para o processo forked -->
-                    <systemPropertyVariables>
                         <QASE_MODE>${QASE_MODE}</QASE_MODE>
                         <QASE_TESTOPS_API_TOKEN>${QASE_TESTOPS_API_TOKEN}</QASE_TESTOPS_API_TOKEN>
                         <QASE_TESTOPS_PROJECT>${QASE_TESTOPS_PROJECT}</QASE_TESTOPS_PROJECT>
