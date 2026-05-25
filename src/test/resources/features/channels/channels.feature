@@ -3,144 +3,129 @@ Feature: Channels — Criar e conectar canais HubMessage
 
   Testa os endpoints de criacao e conexao de canais via API HubMessage.
 
-  Tipos de canal suportados via Newport (campo "type"):
-    - META_WHATSAPP   — WhatsApp via API Oficial Meta
-    - Z_API_WHATSAPP  — WhatsApp via Z-API (nao oficial)
-    - TELEGRAM        — Telegram
-    - META_INSTAGRAM  — Instagram via API Meta
-    - META_FACEBOOK   — Messenger via Facebook/Meta
+  Endpoint de criacao via painel (pennsylvania-hermitage):
+    POST /hermitage/channels
+    Body: { "name": "...", "middleware": "..." }
+    Auth: JWT de sessao de usuario (sk_live retorna 403 — tem ALLOW_INTEGRATION)
+    Tipos (middleware): META_WHATSAPP, Z_API_WHATSAPP, BOT_TELEGRAM, META_INSTAGRAM, META_MESSENGER
 
-  Refs:
-    https://developer.hubmessage.io/channels/create-channel
-    https://developer.hubmessage.io/channels/connect-channel
+  Endpoint de conexao (arkansas-newport via frisco):
+    POST /v1/channels/{channelId}/connect
+    Auth: Bearer sk_live
 
-  POST /v1/channels
-  POST /v1/channels/{channelId}/connect
+  Nota: O CRUD completo de canais via Newport (POST /v1/channels, GET, PUT, DELETE)
+  esta coberto em newport-channels.feature.
 
   Background:
     * url baseUrl
-    * def channelsPrefix = '/v1/channels'
+    * def hermitageChannelsPath = '/hermitage/channels'
+    * def newportChannelsPath = '/v1/channels'
     * def bearerAuth = 'Bearer ' + secretKey
     * def invalidBearer = 'Bearer chave-invalida-que-nao-existe'
 
   # ===========================================================================
-  # POST /v1/channels — Criar canal
+  # POST /hermitage/channels — Criar canal via painel interno
+  # Todos os tipos de middleware sao verificados com sk_live (retorna 403)
+  # pois esse endpoint exige JWT de sessao sem ALLOW_INTEGRATION
+  # Tela: Painel > Canais > Novo canal
   # ===========================================================================
 
-  @qase.id=500 @qase.title=Channels CreateChannel: Criar canal com auth invalido retorna 400
-  @negative
-  Scenario: Criar canal com Authorization invalido retorna 400
-    Given path channelsPrefix
+  @qase.id=500 @qase.title=Channels CreateChannel: POST sem auth retorna 403
+  @negative @smoke
+  Scenario: POST /hermitage/channels sem Authorization retorna 403
+    Given path hermitageChannelsPath
+    And request { "name": "Canal Teste", "middleware": "META_WHATSAPP" }
+    When method POST
+    Then match [400, 401, 403, 500] contains responseStatus
+
+  @qase.id=501 @qase.title=Channels CreateChannel: POST com auth invalido retorna 403
+  @negative @smoke
+  Scenario: POST /hermitage/channels com Authorization invalido retorna 403
+    Given path hermitageChannelsPath
     And header Authorization = invalidBearer
-    And request { "name": "Canal Teste", "type": "META_WHATSAPP" }
+    And request { "name": "Canal Teste", "middleware": "META_WHATSAPP" }
     When method POST
-    Then match [400, 404] contains responseStatus
+    Then match [400, 401, 403] contains responseStatus
 
-  @qase.id=501 @qase.title=Channels CreateChannel: Criar canal sem auth retorna 500
+  @qase.id=502 @qase.title=Channels CreateChannel: POST META_WHATSAPP com sk_live retorna 403
+  @negative @smoke
+  Scenario: POST /hermitage/channels META_WHATSAPP com sk_live retorna 403
+    Given path hermitageChannelsPath
+    And header Authorization = bearerAuth
+    And request { "name": "Karate META_WHATSAPP", "middleware": "META_WHATSAPP" }
+    When method POST
+    Then status 403
+
+  @qase.id=503 @qase.title=Channels CreateChannel: POST Z_API_WHATSAPP com sk_live retorna 403
   @negative
-  Scenario: Criar canal sem Authorization retorna 500
-    Given path channelsPrefix
-    And request { "name": "Canal Teste", "type": "META_WHATSAPP" }
-    When method POST
-    Then match [500, 404] contains responseStatus
-
-  @qase.id=502 @qase.title=Channels CreateChannel: Criar canal com payload vazio retorna 502
-  @negative
-  Scenario: Criar canal com payload vazio retorna 502
-    Given path channelsPrefix
+  Scenario: POST /hermitage/channels Z_API_WHATSAPP com sk_live retorna 403
+    Given path hermitageChannelsPath
     And header Authorization = bearerAuth
-    And request {}
+    And request { "name": "Karate Z_API_WHATSAPP", "middleware": "Z_API_WHATSAPP" }
     When method POST
-    Then match [502, 404] contains responseStatus
+    Then status 403
 
-  @qase.id=504 @qase.title=Channels CreateChannel: Criar canal META_WHATSAPP retorna 201
-  @positive @smoke
-  Scenario: Criar canal META_WHATSAPP retorna 201 com id definido
-    Given path channelsPrefix
+  @qase.id=504 @qase.title=Channels CreateChannel: POST BOT_TELEGRAM com sk_live retorna 403
+  @negative @smoke
+  Scenario: POST /hermitage/channels BOT_TELEGRAM com sk_live retorna 403
+    Given path hermitageChannelsPath
     And header Authorization = bearerAuth
-    And request { "name": "Canal Karate API Test", "type": "META_WHATSAPP" }
+    And request { "name": "Karate BOT_TELEGRAM", "middleware": "BOT_TELEGRAM" }
     When method POST
-    Then match [200, 201, 404] contains responseStatus
+    Then status 403
 
-  @qase.id=505 @qase.title=Channels CreateChannel: Criar canal Z_API_WHATSAPP retorna 200 ou 201
-  @positive @smoke
-  Scenario: Criar canal Z_API_WHATSAPP retorna 200 ou 201 com id definido
-    Given path channelsPrefix
+  @qase.id=505 @qase.title=Channels CreateChannel: POST META_INSTAGRAM com sk_live retorna 403
+  @negative @smoke
+  Scenario: POST /hermitage/channels META_INSTAGRAM com sk_live retorna 403
+    Given path hermitageChannelsPath
     And header Authorization = bearerAuth
-    And request { "name": "Canal Karate ZAPI Test", "type": "Z_API_WHATSAPP" }
+    And request { "name": "Karate META_INSTAGRAM", "middleware": "META_INSTAGRAM" }
     When method POST
-    Then match [200, 201, 404] contains responseStatus
+    Then status 403
 
-  @qase.id=506 @qase.title=Channels CreateChannel: Criar canal TELEGRAM retorna 200 ou 201
-  @positive @smoke
-  Scenario: Criar canal TELEGRAM retorna 200 ou 201 com id definido
-    Given path channelsPrefix
+  @qase.id=506 @qase.title=Channels CreateChannel: POST META_MESSENGER com sk_live retorna 403
+  @negative @smoke
+  Scenario: POST /hermitage/channels META_MESSENGER com sk_live retorna 403
+    Given path hermitageChannelsPath
     And header Authorization = bearerAuth
-    And request { "name": "Canal Karate Telegram Test", "type": "TELEGRAM" }
+    And request { "name": "Karate META_MESSENGER", "middleware": "META_MESSENGER" }
     When method POST
-    Then match [200, 201, 404] contains responseStatus
-
-  @qase.id=507 @qase.title=Channels CreateChannel: Criar canal META_INSTAGRAM retorna 200 ou 201
-  @positive @smoke
-  Scenario: Criar canal META_INSTAGRAM retorna 200 ou 201 com id definido
-    Given path channelsPrefix
-    And header Authorization = bearerAuth
-    And request { "name": "Canal Karate Instagram Test", "type": "META_INSTAGRAM" }
-    When method POST
-    Then match [200, 201, 404] contains responseStatus
-
-  @qase.id=508 @qase.title=Channels CreateChannel: Criar canal META_FACEBOOK (Messenger) retorna 200 ou 201
-  @positive @smoke
-  Scenario: Criar canal META_FACEBOOK (Messenger) retorna 200 ou 201 com id definido
-    Given path channelsPrefix
-    And header Authorization = bearerAuth
-    And request { "name": "Canal Karate Facebook Test", "type": "META_FACEBOOK" }
-    When method POST
-    Then match [200, 201, 404] contains responseStatus
-
-  @qase.id=509 @qase.title=Channels CreateChannel: Criar canal com tipo invalido retorna 400 ou 500
-  @negative
-  Scenario: Criar canal com tipo completamente invalido retorna 400 ou 500
-    Given path channelsPrefix
-    And header Authorization = bearerAuth
-    And request { "name": "Canal Tipo Invalido", "type": "TIPO_INVALIDO_KARATE" }
-    When method POST
-    Then match [400, 500, 502, 404] contains responseStatus
+    Then status 403
 
   # ===========================================================================
-  # POST /v1/channels/{channelId}/connect — Conectar canal (validar chamada)
+  # POST /v1/channels/{channelId}/connect — Conectar canal ao numero WhatsApp
   # ===========================================================================
 
-  @qase.id=510 @qase.title=Channels ConnectChannel: Conectar canal com auth invalido retorna 400
+  @qase.id=510 @qase.title=Channels ConnectChannel: POST com auth invalido retorna 400
   @negative
-  Scenario: Conectar canal com Authorization invalido retorna 400
-    Given path channelsPrefix + '/' + metaChannelId + '/connect'
+  Scenario: POST conectar canal com Authorization invalido retorna 400
+    Given path newportChannelsPath + '/' + metaChannelId + '/connect'
     And header Authorization = invalidBearer
     And request {}
     When method POST
     Then status 400
 
-  @qase.id=511 @qase.title=Channels ConnectChannel: Conectar canal sem auth retorna 400 ou 500
+  @qase.id=511 @qase.title=Channels ConnectChannel: POST sem auth retorna 400 ou 500
   @negative
-  Scenario: Conectar canal sem Authorization retorna 400 ou 500
-    Given path channelsPrefix + '/' + metaChannelId + '/connect'
+  Scenario: POST conectar canal sem Authorization retorna 400 ou 500
+    Given path newportChannelsPath + '/' + metaChannelId + '/connect'
     And request {}
     When method POST
     Then match [400, 500] contains responseStatus
 
-  @qase.id=512 @qase.title=Channels ConnectChannel: Conectar canal com channelId inexistente retorna 404
+  @qase.id=512 @qase.title=Channels ConnectChannel: POST com channelId inexistente retorna 404
   @negative
-  Scenario: Conectar canal com channelId inexistente retorna 404
-    Given path channelsPrefix + '/00000000000000000000000000000000/connect'
+  Scenario: POST conectar canal com channelId inexistente retorna 404
+    Given path newportChannelsPath + '/00000000000000000000000000000000/connect'
     And header Authorization = bearerAuth
     And request {}
     When method POST
     Then match [400, 404] contains responseStatus
 
-  @qase.id=513 @qase.title=Channels ConnectChannel: Conectar canal valido valida chamada a API retorna 200 ou 502
+  @qase.id=513 @qase.title=Channels ConnectChannel: POST canal valido valida que API e chamada
   @positive @smoke
-  Scenario: Conectar canal valido valida que a API e chamada e retorna 200 ou 502
-    Given path channelsPrefix + '/' + metaChannelId + '/connect'
+  Scenario: POST conectar canal valido valida que a API e chamada retorna 200 ou 400 ou 502
+    Given path newportChannelsPath + '/' + metaChannelId + '/connect'
     And header Authorization = bearerAuth
     And request {}
     When method POST
