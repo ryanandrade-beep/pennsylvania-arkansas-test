@@ -3,12 +3,12 @@ Feature: Channels — Criar e conectar canais HubMessage
 
   Testa os endpoints de criacao e conexao de canais via API HubMessage.
 
-  Tipos de canal suportados (campo "type"):
-    - META_WHATSAPP  — WhatsApp via API Oficial Meta
-    - ZAPI_WHATSAPP  — WhatsApp via Z-API (nao oficial)
-    - BOT_TELEGRAM   — Telegram via bot token
-    - META_INSTAGRAM — Instagram via API Meta
-    - META_MESSENGER — Messenger via API Meta
+  Tipos de canal suportados via Newport (campo "type"):
+    - META_WHATSAPP   — WhatsApp via API Oficial Meta
+    - Z_API_WHATSAPP  — WhatsApp via Z-API (nao oficial)
+    - TELEGRAM        — Telegram
+    - META_INSTAGRAM  — Instagram via API Meta
+    - META_FACEBOOK   — Messenger via Facebook/Meta
 
   Refs:
     https://developer.hubmessage.io/channels/create-channel
@@ -62,21 +62,21 @@ Feature: Channels — Criar e conectar canais HubMessage
     When method POST
     Then match [200, 201, 404] contains responseStatus
 
-  @qase.id=505 @qase.title=Channels CreateChannel: Criar canal ZAPI_WHATSAPP retorna 200 ou 201
+  @qase.id=505 @qase.title=Channels CreateChannel: Criar canal Z_API_WHATSAPP retorna 200 ou 201
   @positive @smoke
-  Scenario: Criar canal ZAPI_WHATSAPP retorna 200 ou 201 com id definido
+  Scenario: Criar canal Z_API_WHATSAPP retorna 200 ou 201 com id definido
     Given path channelsPrefix
     And header Authorization = bearerAuth
-    And request { "name": "Canal Karate ZAPI Test", "type": "ZAPI_WHATSAPP" }
+    And request { "name": "Canal Karate ZAPI Test", "type": "Z_API_WHATSAPP" }
     When method POST
     Then match [200, 201, 404] contains responseStatus
 
-  @qase.id=506 @qase.title=Channels CreateChannel: Criar canal BOT_TELEGRAM retorna 200 ou 201
+  @qase.id=506 @qase.title=Channels CreateChannel: Criar canal TELEGRAM retorna 200 ou 201
   @positive @smoke
-  Scenario: Criar canal BOT_TELEGRAM retorna 200 ou 201 com id definido
+  Scenario: Criar canal TELEGRAM retorna 200 ou 201 com id definido
     Given path channelsPrefix
     And header Authorization = bearerAuth
-    And request { "name": "Canal Karate Telegram Test", "type": "BOT_TELEGRAM" }
+    And request { "name": "Canal Karate Telegram Test", "type": "TELEGRAM" }
     When method POST
     Then match [200, 201, 404] contains responseStatus
 
@@ -89,18 +89,18 @@ Feature: Channels — Criar e conectar canais HubMessage
     When method POST
     Then match [200, 201, 404] contains responseStatus
 
-  @qase.id=508 @qase.title=Channels CreateChannel: Criar canal META_MESSENGER retorna 200 ou 201
+  @qase.id=508 @qase.title=Channels CreateChannel: Criar canal META_FACEBOOK (Messenger) retorna 200 ou 201
   @positive @smoke
-  Scenario: Criar canal META_MESSENGER retorna 200 ou 201 com id definido
+  Scenario: Criar canal META_FACEBOOK (Messenger) retorna 200 ou 201 com id definido
     Given path channelsPrefix
     And header Authorization = bearerAuth
-    And request { "name": "Canal Karate Messenger Test", "type": "META_MESSENGER" }
+    And request { "name": "Canal Karate Facebook Test", "type": "META_FACEBOOK" }
     When method POST
     Then match [200, 201, 404] contains responseStatus
 
-  @qase.id=509 @qase.title=Channels CreateChannel: Criar canal com tipo invalido retorna 500 ou 400
+  @qase.id=509 @qase.title=Channels CreateChannel: Criar canal com tipo invalido retorna 400 ou 500
   @negative
-  Scenario: Criar canal com tipo completamente invalido retorna 500 ou 400
+  Scenario: Criar canal com tipo completamente invalido retorna 400 ou 500
     Given path channelsPrefix
     And header Authorization = bearerAuth
     And request { "name": "Canal Tipo Invalido", "type": "TIPO_INVALIDO_KARATE" }
