@@ -1,256 +1,305 @@
-# Pennsylvania Arkansas Test
+# Pennsylvania Arkansas Test — Automação de API
 
-Testes automatizados de API para os servicos **Arkansas** (conway, barling, newport) da plataforma HubMessage, utilizando **Karate DSL** com integracao ao **Qase TMS** (projeto `PA`).
-
-Estruturado no mesmo padrao do `pennsylvania-frisco-test`, com cenarios `Given / And / When / Then` cobrindo todos os 55 endpoints dos servicos arkansas.
-
----
-
-## Requisitos
-
-- **Java** >= 17
-- **Maven** >= 3.8
+Suite de testes automatizados de API para a plataforma **HubMessage** (microserviços Arkansas).
+Utiliza **Karate DSL 1.4.1** com **JUnit 5**, integrado ao **Qase TMS**.
 
 ---
 
-## Instalando o projeto
+## Estrutura de arquivos
+
+```
+src/test/resources/features/
+├── health/
+│   └── health.feature                   # Health checks de todos os serviços
+├── channels/
+│   ├── channels.feature                 # Criar e conectar canais (META_WHATSAPP, ZAPI_WHATSAPP)
+│   ├── channels-platforms.feature       # Ativar/desativar plataformas (Instagram, Messenger, Telegram, Meta)
+│   └── trial.feature                    # Verificação de status trial
+├── barling/
+│   └── barling-messages.feature         # Envio, encaminhamento e deleção de mensagens via Barling
+├── messages/
+│   └── messages.feature                 # Envio de todos os tipos de mensagem via canal Meta
+├── templates/
+│   ├── templates.feature                # CRUD de templates WhatsApp Business (staging)
+│   └── templates-production.feature     # Templates adicionais (WABA 993644263088265)
+├── newport/
+│   ├── newport-channels.feature         # CRUD de canais via Newport
+│   ├── newport-telegram.feature         # Ativação de Telegram via Newport
+│   ├── newport-zapi-instances.feature   # Endpoints de instâncias Z-API
+│   └── newport-zapi-groups.feature      # Gerenciamento de grupos WhatsApp Z-API
+└── hermitage/
+    └── hermitage.feature                # Auditoria, usuários, faturamento e administração
+```
+
+---
+
+## Roadmap de APIs testadas
+
+### Canais (`/v1/channels` — arkansas-newport + pennsylvania-frisco)
+
+| Método | Rota | Feature | Qase IDs | Descrição |
+|--------|------|---------|----------|-----------|
+| `POST` | `/v1/channels` | channels.feature | 500–508 | Criar canal (META_WHATSAPP, ZAPI_WHATSAPP, tipos inválidos) |
+| `POST` | `/v1/channels/{id}/connect` | channels.feature | 510–513 | Conectar canal ao número de WhatsApp |
+| `POST` | `/v1/channels` | trial.feature | 1100–1103 | Criar canal e verificar status trial |
+
+### Plataformas de Canais (`/channels/{id}` — pennsylvania-hermitage)
+
+| Método | Rota | Feature | Qase IDs | Descrição |
+|--------|------|---------|----------|-----------|
+| `POST` | `/channels/{id}/activate-meta` | channels-platforms.feature | 600–603 | Ativar WhatsApp Meta num canal |
+| `POST` | `/channels/{id}/deactivate-meta` | channels-platforms.feature | 604–605 | Desativar WhatsApp Meta |
+| `POST` | `/channels/{id}/activate-instagram` | channels-platforms.feature | 610–613 | Ativar Instagram num canal |
+| `POST` | `/channels/{id}/deactivate-instagram` | channels-platforms.feature | 614–615 | Desativar Instagram |
+| `POST` | `/channels/{id}/list-messenger-pages` | channels-platforms.feature | 620–622 | Listar páginas do Facebook para Messenger |
+| `POST` | `/channels/{id}/activate-messenger` | channels-platforms.feature | 630–633 | Ativar Messenger num canal |
+| `POST` | `/channels/{id}/deactivate-messenger` | channels-platforms.feature | 634–635 | Desativar Messenger |
+| `POST` | `/channels/{id}/activate-telegram` | channels-platforms.feature | 640–643 | Ativar Telegram num canal |
+| `POST` | `/channels/{id}/deactivate-telegram` | channels-platforms.feature | 644–645 | Desativar Telegram |
+
+### Mensagens — Barling (`/v1/channels/{id}/messages` — arkansas-barling)
+
+| Método | Rota | Feature | Qase IDs | Descrição |
+|--------|------|---------|----------|-----------|
+| `POST` | `/v1/channels/{id}/messages` | barling-messages.feature | 10–44 | Envio de mensagens (TEXT, IMAGE, AUDIO, VIDEO, CONTACT, STICKER, INTERACTIVE) |
+| `POST` | `/v1/channels/{id}/messages/forward` | barling-messages.feature | — | Encaminhar mensagem |
+| `DELETE` | `/v1/channels/{id}/messages/{msgId}` | barling-messages.feature | — | Deletar mensagem |
+
+### Mensagens — Meta WhatsApp (`/v1/channels/{metaChannelId}/messages`)
+
+| Método | Rota | Feature | Qase IDs | Descrição |
+|--------|------|---------|----------|-----------|
+| `POST` | `/v1/channels/{id}/messages` | messages.feature | 1000–1004 | Enviar template aprovado |
+| `POST` | `/v1/channels/{id}/messages` | messages.feature | 1010–1014 | Enviar texto simples |
+| `POST` | `/v1/channels/{id}/messages` | messages.feature | 1020–1023 | Enviar imagem com legenda |
+| `POST` | `/v1/channels/{id}/messages` | messages.feature | 1030–1033 | Enviar áudio |
+| `POST` | `/v1/channels/{id}/messages` | messages.feature | 1040–1043 | Enviar vídeo com legenda |
+| `POST` | `/v1/channels/{id}/messages` | messages.feature | 1050–1053 | Enviar contato |
+| `POST` | `/v1/channels/{id}/messages` | messages.feature | 1060–1063 | Enviar sticker (webp) |
+| `POST` | `/v1/channels/{id}/messages` | messages.feature | 1070–1074 | Enviar botões de ação (URL + CALL) |
+| `POST` | `/v1/channels/{id}/messages` | messages.feature | 1080–1084 | Enviar texto com botões de resposta rápida |
+
+> **Obs:** Mensagens livres (TEXT, IMAGE, etc.) só funcionam dentro da janela de 24h.
+> Fora da janela, usar TEMPLATE.
+
+### Templates WhatsApp Business (`/whatsapp/businesses`)
+
+| Método | Rota | Feature | Qase IDs | Descrição |
+|--------|------|---------|----------|-----------|
+| `GET` | `/whatsapp/businesses` | templates.feature | 900–902 | Listar WABAs disponíveis |
+| `GET` | `/whatsapp/businesses/{wabaId}/templates` | templates.feature | 910–913 | Listar templates do WABA |
+| `POST` | `/whatsapp/businesses/{wabaId}/templates/sync` | templates.feature | 920–923 | Sincronizar templates com a Meta |
+| `POST` | `/whatsapp/businesses/{wabaId}/templates` | templates.feature | 930–960 | Criar templates (Customizado, OTP, Cupom, Oferta, Permissão de chamada, Library, Carrossel, Catálogo, Checkout, MPM) |
+| `PUT` | `/whatsapp/businesses/{wabaId}/templates/{id}` | templates.feature | 940–943 | Editar template existente |
+| `DELETE` | `/whatsapp/businesses/{wabaId}/templates/{id}` | templates.feature | 950–953 | Deletar template |
+| `GET` | `/whatsapp/businesses/{wabaId}/templates` | templates-production.feature | 1000–1002 | Listar templates (WABA staging) |
+| `POST` | `/whatsapp/businesses/{wabaId}/templates` | templates-production.feature | 1010–1130 | Criar templates (HEADER IMAGE/VIDEO/DOC, PHONE_NUMBER, botões mistos, AUTH zero/one-tap, CAROUSEL, LIMITED_TIME_OFFER, Cupom) |
+
+**Templates cobertos por tipo:**
+
+| Tipo | Cenários | Feature |
+|------|----------|---------|
+| Customizado MARKETING | @qase.id=934 | templates.feature |
+| Customizado UTILITY | @qase.id=945 | templates.feature |
+| Autenticação OTP (COPY_CODE) | @qase.id=935 | templates.feature |
+| Cupom (COPY_CODE button) | @qase.id=936 | templates.feature |
+| Oferta por tempo limitado | @qase.id=937 | templates.feature |
+| Permissão de chamada MARKETING | @qase.id=938 | templates.feature |
+| Permissão de chamada UTILITY | @qase.id=946 | templates.feature |
+| Template Library MARKETING (QUICK_REPLY) | @qase.id=939 | templates.feature |
+| Template Library UTILITY (URL button) | @qase.id=947 | templates.feature |
+| Carrossel de mídia | @qase.id=944 | templates.feature |
+| Catálogo | @qase.id=948 | templates.feature |
+| Botão de checkout (MPM) | @qase.id=949 | templates.feature |
+| Carrossel de produtos | @qase.id=954 | templates.feature |
+| Multi-produto (MPM) | @qase.id=955 | templates.feature |
+| HEADER IMAGE MARKETING | @qase.id=1010 | templates-production.feature |
+| HEADER IMAGE UTILITY | @qase.id=1011 | templates-production.feature |
+| HEADER VIDEO | @qase.id=1020 | templates-production.feature |
+| HEADER DOCUMENT | @qase.id=1030 | templates-production.feature |
+| Botão PHONE_NUMBER MARKETING | @qase.id=1040 | templates-production.feature |
+| Botão PHONE_NUMBER UTILITY | @qase.id=1041 | templates-production.feature |
+| Botões mistos URL+PHONE+QUICK_REPLY | @qase.id=1050 | templates-production.feature |
+| Botões URL+PHONE_NUMBER UTILITY | @qase.id=1051 | templates-production.feature |
+| AUTHENTICATION zero_tap | @qase.id=1060 | templates-production.feature |
+| AUTHENTICATION one_tap | @qase.id=1061 | templates-production.feature |
+| HEADER TEXT dinâmico | @qase.id=1070 | templates-production.feature |
+| Carrossel VIDEO | @qase.id=1080 | templates-production.feature |
+| Carrossel misto IMAGE+VIDEO | @qase.id=1081 | templates-production.feature |
+| Somente BODY MARKETING | @qase.id=1090 | templates-production.feature |
+| Somente BODY UTILITY | @qase.id=1091 | templates-production.feature |
+| Cupom com HEADER IMAGE | @qase.id=1100 | templates-production.feature |
+| LIMITED_TIME_OFFER com HEADER IMAGE | @qase.id=1101 | templates-production.feature |
+
+### Newport — Canais (`/v1/channels` — arkansas-newport)
+
+| Método | Rota | Feature | Qase IDs | Descrição |
+|--------|------|---------|----------|-----------|
+| `POST` | `/v1/channels` | newport-channels.feature | 100–142 | CRUD completo de canais |
+| `PUT` | `/v1/channels/{id}/telegram/active` | newport-telegram.feature | 200–205 | Ativar Telegram no canal |
+
+### Newport — Z-API Instâncias (`/v1/channels/{id}/zapi/instances`)
+
+| Método | Rota | Feature | Qase IDs | Descrição |
+|--------|------|---------|----------|-----------|
+| `GET` | `.../status` | newport-zapi-instances.feature | 300–461 | Status, QR Code, device, contatos, phone-exists, disconnect, fila, read-message, profile-picture |
+
+### Newport — Z-API Grupos
+
+| Método | Rota | Feature | Qase IDs | Descrição |
+|--------|------|---------|----------|-----------|
+| `POST` | `.../create-group` | newport-zapi-groups.feature | 500–591 | Criar/gerenciar grupos (add/remove participant, admin, leave, update name/photo/description) |
+
+### Health Checks
+
+| Método | Rota | Feature | Qase IDs | Descrição |
+|--------|------|---------|----------|-----------|
+| `GET` | `/` | health.feature | 1–8 | Health check de todos os microserviços (barling, conway-zapi, conway-telegram, conway-meta, newport) |
+
+### Hermitage — Auditoria (`/hermitage/audit-events`)
+
+> **O que foi testado na auditoria:**
+> Os endpoints de auditoria exigem **JWT de sessão de usuário** (gerado via login no painel), não a secret key de integração (`sk_live_*`).
+> Por isso, **todos os testes verificam que a API recusa corretamente** as requisições sem autenticação adequada.
+>
+> Especificamente foram testados:
+> - `GET /hermitage/audit-events` sem auth → deve retornar **403**
+> - `GET /hermitage/audit-events` com `sk_live` → deve retornar **403** (secret key não é JWT de sessão)
+> - `GET /hermitage/audit-events` com `Bearer sk_live` → deve retornar **403**
+> - `GET /hermitage/audit-events` com token inválido → deve retornar **403**
+> - `GET /hermitage/audit-events/actions` sem auth → deve retornar **403**
+> - `GET /hermitage/audit-events/actions` com `sk_live` → deve retornar **403**
+>
+> Esses testes garantem que o endpoint de auditoria **está protegido** e não expõe dados sem autenticação válida.
+
+| Método | Rota | Feature | Qase IDs | Descrição |
+|--------|------|---------|----------|-----------|
+| `GET` | `/hermitage/audit-events` | hermitage.feature | 1200–1203 | Listar eventos de auditoria (todos negativos — exige JWT sessão) |
+| `GET` | `/hermitage/audit-events/actions` | hermitage.feature | 1210–1211 | Listar ações disponíveis (negativos) |
+
+### Hermitage — Usuários (`/hermitage/users`)
+
+| Método | Rota | Feature | Qase IDs | Descrição |
+|--------|------|---------|----------|-----------|
+| `GET` | `/hermitage/users/get-user` | hermitage.feature | 1220–1223 | Obter usuário atual (negativos — exige JWT sessão) |
+| `PUT` | `/hermitage/users/update` | hermitage.feature | 1230–1234 | Atualizar dados do usuário (negativos) |
+| `GET` | `/hermitage/users/v2` | hermitage.feature | 1250–1252 | Listar usuários paginado (admin) |
+| `GET` | `/hermitage/users/partner` | hermitage.feature | 1253–1254 | Listar parceiros (admin) |
+| `PUT` | `/hermitage/users/{id}/block` | hermitage.feature | 1260–1261 | Bloquear usuário (admin) |
+| `PUT` | `/hermitage/users/{id}/unblock` | hermitage.feature | 1262–1263 | Desbloquear usuário (admin) |
+| `POST` | `/hermitage/users/{id}/turn-partner` | hermitage.feature | 1270–1271 | Habilitar parceria (admin) |
+| `POST` | `/hermitage/users/{id}/remove-partner` | hermitage.feature | 1272–1273 | Remover parceria (admin) |
+| `POST` | `/hermitage/users/{id}/turn-into-pyramid` | hermitage.feature | 1280–1281 | Habilitar influencer/pyramid (admin) |
+
+### Hermitage — Faturamento (`/hermitage/billing` + `/hermitage/person-bills`)
+
+| Método | Rota | Feature | Qase IDs | Descrição |
+|--------|------|---------|----------|-----------|
+| `PUT` | `/hermitage/person-bills` | hermitage.feature | 1240–1244 | Atualizar dados de faturamento (nome, CPF/CNPJ, endereço) |
+| `GET` | `/hermitage/billing/invoices` | hermitage.feature | 1290–1292 | Listar faturas Stripe |
+| `GET` | `/hermitage/billing/upcoming` | hermitage.feature | 1295–1296 | Próxima cobrança |
+| `GET` | `/hermitage/billing/subscription-timeline` | hermitage.feature | 1298–1299 | Linha do tempo de assinaturas |
+
+### Hermitage — Administração de Workspaces (`/hermitage/admin/workspaces`)
+
+| Método | Rota | Feature | Qase IDs | Descrição |
+|--------|------|---------|----------|-----------|
+| `GET` | `/hermitage/admin/workspaces` | hermitage.feature | 1300–1302 | Listar workspaces (admin) |
+| `POST` | `/hermitage/admin/workspaces/{id}/turn-partner` | hermitage.feature | 1310–1311 | Tornar workspace parceiro (admin) |
+| `POST` | `/hermitage/admin/workspaces/{id}/remove-partner` | hermitage.feature | 1312–1313 | Remover parceria do workspace (admin) |
+
+---
+
+## Configuração de ambiente
+
+### Arquivo `.env`
+
+```
+BASE_URL=https://api.staging.hubmessage.io
+SECRET_KEY=sk_live_...
+META_CHANNEL_ID=019E4C54B1B375A28970B605CA9B03C3
+PHONE_NUMBER=5544936181064
+BUSINESS_ID=993644263088265
+TEMPLATE_NAME=teste_1
+TEMPLATE_ID=1538401031323218
+
+# IDs dos usuários de teste (apenas estes devem ser manipulados)
+ADMIN_USER_ID_RYAN=3F1AF0B1471430BB940DD6E09DE4E657
+ADMIN_USER_ID_PARCEIRO=019DF4A038077CE89B668C7EC4275B80
+```
+
+### Variável `karateSuffix` — Solução para templates duplicados
+
+Toda execução dos testes cria templates novos. Como a API da Meta **não permite dois templates com o mesmo nome** no mesmo WABA, o Karate gera automaticamente um sufixo único baseado no timestamp da execução (`System.currentTimeMillis()`).
+
+**Como funciona:**
+- Em cada run, `karateSuffix` recebe o valor do timestamp atual (ex: `1748177432000`)
+- Todos os nomes de templates nos feature files usam `#(karateSuffix)` no final
+- Resultado: `karate_customizado_mkt_v1_1748177432000` — único por execução
+
+**Uso nos feature files:**
+```gherkin
+And request
+  """
+  {
+    "name": "karate_meu_template_v1_#(karateSuffix)",
+    "category": "MARKETING",
+    ...
+  }
+  """
+```
+
+---
+
+## Como executar
 
 ```bash
-git clone git@github.com:irrahgroup/pennsylvania-arkansas-test.git
-cd pennsylvania-arkansas-test
-mvn dependency:resolve
+# Todos os testes de regressão (ambiente staging)
+./run.sh staging @regression
+
+# Apenas templates
+./run.sh staging @templates
+
+# Apenas mensagens
+./run.sh staging @messages
+
+# Apenas canais
+./run.sh staging @channels
+
+# Apenas health checks
+./run.sh staging @smoke
+
+# Com Qase TMS (cria run e reporta resultados)
+./run-tests-qase.sh staging @regression
 ```
 
 ---
 
-## Configurando as variaveis de ambiente
+## Cobertura total de cenários
 
-Crie o arquivo `.env` na raiz do projeto:
-
-```env
-# URL base
-BASE_URL=https://api.hubmessage.io
-
-# URLs diretas dos microservicos (opcional — fallback para BASE_URL)
-CONWAY_ZAPI_URL=https://api.hubmessage.io
-CONWAY_TELEGRAM_URL=https://api.hubmessage.io
-CONWAY_META_URL=https://api.hubmessage.io
-BARLING_URL=https://api.hubmessage.io
-NEWPORT_URL=https://api.hubmessage.io
-
-# Credenciais
-SECRET_KEY=sk_live_sua_chave_aqui
-PUBLIC_KEY=pk_live_sua_chave_aqui
-ENTERPRISE_SECRET_KEY=sk_live_sua_chave_enterprise_aqui
-
-# IDs de recursos para os testes
-CHANNEL_ID=id_do_canal_meta
-ZAPI_CHANNEL_ID=id_do_canal_zapi
-TELEGRAM_CHANNEL_ID=id_do_canal_telegram
-META_CHANNEL_ID=id_do_canal_meta_whatsapp
-PHONE_NUMBER=5511999999999
-MESSAGE_ID=id_de_uma_mensagem_existente
-TELEGRAM_BOT_TOKEN=seu_bot_token_telegram
-
-# IDs para testes de template
-BUSINESS_ID=seu_business_id_meta
-TEMPLATE_ID=id_do_template_aprovado
-TEMPLATE_NAME=nome_do_template_aprovado
-
-# Qase TMS — projeto PA (Pennsylvania)
-QASE_TESTOPS_API_TOKEN=seu_token_qase_aqui
-QASE_TESTOPS_PROJECT=PA
-QASE_TESTOPS_RUN_TITLE="Automated test - API - run"
-```
+| Feature file | Cenários | Tags |
+|---|---|---|
+| health.feature | 8 | @health @smoke @regression |
+| channels.feature | 13 | @channels @regression |
+| channels-platforms.feature | 23 | @channels @platforms @regression |
+| trial.feature | 4 | @trial @regression |
+| barling-messages.feature | 35 | @barling @regression |
+| messages.feature | 41 | @messages @regression |
+| templates.feature | 22 | @templates @regression |
+| templates-production.feature | ~30 | @templates @regression |
+| newport-channels.feature | 25 | @newport @channels @regression |
+| newport-telegram.feature | 6 | @newport @telegram @regression |
+| newport-zapi-instances.feature | 42 | @newport @zapi @regression |
+| newport-zapi-groups.feature | 20 | @newport @zapi @groups @regression |
+| hermitage.feature | ~60 | @hermitage @regression |
+| **Total** | **~329** | |
 
 ---
 
-## Rodando os testes localmente
+## Relatório
 
-```bash
-set -a && source .env && set +a
-mvn test -Dkarate.env=production
-```
-
-### Por ambiente
-
-```bash
-mvn test -Dkarate.env=staging
-mvn test -Dkarate.env=production
-mvn test -Dkarate.env=local
-```
-
-### Por tag
-
-```bash
-# Smoke tests (execucao rapida)
-mvn test -Dkarate.options="--tags @smoke"
-
-# Por servico
-mvn test -Dkarate.options="--tags @barling"
-mvn test -Dkarate.options="--tags @newport"
-mvn test -Dkarate.options="--tags @conway"
-
-# Por tipo de canal
-mvn test -Dkarate.options="--tags @zapi"
-mvn test -Dkarate.options="--tags @telegram"
-mvn test -Dkarate.options="--tags @meta"
-
-# Por resultado esperado
-mvn test -Dkarate.options="--tags @positive"
-mvn test -Dkarate.options="--tags @negative"
-
-# Suite completa
-mvn test -Dkarate.options="--tags @regression"
-```
-
----
-
-## Rodando com Qase TMS
-
-O script `run-tests-qase.sh` cria o run, executa os testes e fecha o run automaticamente. Cada Scenario e enviado individualmente via `QaseKarateHook`.
-
-```bash
-# Todos os testes (@regression)
-./run-tests-qase.sh
-
-# Por tag
-./run-tests-qase.sh @smoke
-./run-tests-qase.sh @barling
-./run-tests-qase.sh @newport
-./run-tests-qase.sh @conway
-
-# Tag + ambiente + titulo personalizado
-./run-tests-qase.sh @regression production "Automated test - API"
-./run-tests-qase.sh @smoke staging "Manual test - Smoke"
-```
-
----
-
-## Como funciona a integracao com o Qase
-
-O `QaseKarateHook` e um `RuntimeHook` do Karate registrado no `TestRunner`. Ao final de cada Scenario:
-
-1. Le o nome do Scenario como titulo do caso
-2. Envia `POST /v1/result/PA/{runId}` com status `passed` ou `failed`
-3. Se o caso nao existir, cria automaticamente e reenvia
-
-O `run-tests-qase.sh` orquestra:
-1. `POST /v1/run/PA` — cria o run e captura o `RUN_ID`
-2. `mvn test` — executa com `-DQASE_TESTOPS_RUN_ID={RUN_ID}`
-3. `POST /v1/run/PA/{RUN_ID}/complete` — fecha o run
-
----
-
-## Relatorio HTML
-
-Apos a execucao, abra no navegador:
-
+Após execução, o relatório HTML do Karate fica disponível em:
 ```
 target/karate-reports/karate-summary.html
 ```
-
----
-
-## Estrutura do projeto
-
-```
-pennsylvania-arkansas-test/
-├── .github/workflows/ci.yml
-├── src/test/
-│   ├── java/com/irrahgroup/arkansas/
-│   │   ├── TestRunner.java               # JUnit 5 runner com execucao paralela
-│   │   └── QaseKarateHook.java           # RuntimeHook — envia cada Scenario ao Qase
-│   └── resources/
-│       ├── junit-platform.properties     # Ativa autodetection do JUnit 5
-│       ├── karate-config.js              # Configuracao global (URLs, credenciais, env)
-│       └── features/
-│           ├── health/
-│           │   └── health.feature         # Qase IDs: 1–8    | 8 cenarios
-│           ├── barling/
-│           │   └── barling-messages.feature   # Qase IDs: 10–44  | 35 cenarios
-│           ├── conway/
-│           │   ├── conway-zapi-webhooks.feature    # Qase IDs: 600–613 | 14 cenarios
-│           │   ├── conway-telegram-webhooks.feature # Qase IDs: 700–705 | 6 cenarios
-│           │   └── conway-meta-webhooks.feature    # Qase IDs: 800–841 | 16 cenarios
-│           └── newport/
-│               ├── newport-channels.feature         # Qase IDs: 100–142 | 25 cenarios
-│               ├── newport-telegram.feature         # Qase IDs: 200–205 | 6 cenarios
-│               ├── newport-zapi-instances.feature   # Qase IDs: 300–461 | 42 cenarios
-│               └── newport-zapi-groups.feature      # Qase IDs: 500–591 | 20 cenarios
-├── .env                                  # Variaveis de ambiente (nao versionado)
-├── .gitignore
-├── qase.config.json
-├── run-tests-qase.sh                     # Script principal com Qase
-├── run.sh                                # Script local sem Qase
-└── pom.xml
-```
-
-**Total: 229 cenarios** em 11 feature files cobrindo todos os endpoints.
-
----
-
-## Suites de teste e cobertura
-
-| Feature | Servico | Endpoints | Qase IDs | Cenarios |
-|---|---|---|---|---|
-| `health` | barling / newport / conway | `GET /` `GET /health-check` | 1–8 | 8 |
-| `barling-messages` | barling | `POST/DELETE /v1/channels/{id}/messages` `POST .../forward` | 10–44 | 35 |
-| `newport-channels` | newport | `GET/POST/PUT/DELETE /v1/channels` `GET/POST/PUT/DELETE /v1/channels/{id}` | 100–142 | 25 |
-| `newport-telegram` | newport | `PUT /v1/channels/{id}/telegram/active` | 200–205 | 6 |
-| `newport-zapi-instances` | newport | 22 endpoints `/v1/channels/{id}/zapi/instances/*` | 300–461 | 42 |
-| `newport-zapi-groups` | newport | 10 endpoints de grupos WhatsApp | 500–591 | 20 |
-| `conway-zapi-webhooks` | conway-zapi | `POST .../zapi/webhooks` `POST .../zapi/webhooks/init-data` | 600–613 | 14 |
-| `conway-telegram-webhooks` | conway-telegram | `POST .../telegram/webhooks` | 700–705 | 6 |
-| `conway-meta-webhooks` | conway-meta/instagram/messenger/ml/email | 5 endpoints de webhook | 800–841 | 16 |
-| `templates` | API principal | `GET/POST/PUT/DELETE /whatsapp/businesses/*` | 900–960 | 22 |
-| `messages` | API principal | `POST /v1/channels/{id}/messages` (8 tipos) | 1000–1084 | 41 |
-
----
-
-## Tags disponíveis
-
-| Tag | Descricao |
-|---|---|
-| `@smoke` | Conjunto minimo para validacao rapida |
-| `@regression` | Suite completa |
-| `@positive` | Cenarios de sucesso (happy path) |
-| `@negative` | Cenarios de erro (auth invalida, 404, 400) |
-| `@health` | Health checks |
-| `@barling` | Testes do servico barling |
-| `@newport` | Testes do servico newport |
-| `@conway` | Testes do servico conway |
-| `@zapi` | Testes Z-API WhatsApp |
-| `@telegram` | Testes Telegram |
-| `@meta` | Testes Meta (WA / Instagram / Messenger) |
-| `@channels` | CRUD de canais (newport) |
-| `@groups` | Grupos WhatsApp (newport) |
-
----
-
-## Pipeline CI/CD
-
-Arquivo `.github/workflows/ci.yml`:
-- **Trigger:** push em `main` ou execucao manual
-- **Runtime:** `ubuntu-latest`, Java 17, Maven 3.8
-- **Secrets necessarios:** `BASE_URL`, `SECRET_KEY`, `PUBLIC_KEY`, `ENTERPRISE_SECRET_KEY`, `CHANNEL_ID`, `ZAPI_CHANNEL_ID`, `TELEGRAM_CHANNEL_ID`, `META_CHANNEL_ID`, `PHONE_NUMBER`, `MESSAGE_ID`, `TELEGRAM_BOT_TOKEN`, `QASE_TESTOPS_API_TOKEN`, `QASE_TESTOPS_PROJECT`
-
----
-
-## Servicos testados
-
-| Servico | Funcao |
-|---|---|
-| `arkansas-barling` | Orquestracao de mensagens outbound |
-| `arkansas-newport` | CRUD de canais + gerenciamento Z-API/Telegram |
-| `arkansas-conway` | Gateway de webhooks inbound (Z-API, Telegram, Meta, ML, Email) |
-
----
-
-## Relacionamento com outros projetos
-
-| Projeto | Stack | Descricao |
-|---|---|---|
-| `pennsylvania-frisco-test` | Jest + Node.js | Suite para a API principal HubMessage — projeto de referencia |
-| `pennsylvania-conway-test` | Jest + Node.js | Suite para canais Conway |
-| `pennsylvania-arkansas-test` | **Karate + Java** | **Este projeto** — suite para os microservicos Arkansas |
+Abra no navegador para ver o resultado completo com detalhes de cada cenário.

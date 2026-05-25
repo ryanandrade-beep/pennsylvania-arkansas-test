@@ -9,7 +9,7 @@ Feature: Messages — Envio de Mensagens Livres via Canal
 
   Background:
     * url baseUrl
-    * def channelPath = '/v1/channels/' + channelId + '/messages'
+    * def channelPath = '/v1/channels/' + metaChannelId + '/messages'
     * def channelInexistente = '/v1/channels/00000000000000000000000000000000/messages'
 
   # ===========================================================================

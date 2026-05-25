@@ -55,6 +55,7 @@ jobs:
           ZAPI_CHANNEL_ID: ${{ secrets.ZAPI_CHANNEL_ID }}
           TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
           META_CHANNEL_ID: ${{ secrets.META_CHANNEL_ID }}
+          TRIAL_CHANNEL_ID: ${{ secrets.TRIAL_CHANNEL_ID }}
           PHONE_NUMBER: ${{ secrets.PHONE_NUMBER }}
           MESSAGE_ID: ${{ secrets.MESSAGE_ID }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
@@ -64,6 +65,9 @@ jobs:
           BUSINESS_ID: ${{ secrets.BUSINESS_ID }}
           TEMPLATE_ID: ${{ secrets.TEMPLATE_ID }}
           TEMPLATE_NAME: ${{ secrets.TEMPLATE_NAME }}
+          # Usuarios de administracao (apenas Ryan e Parceiro teste)
+          ADMIN_USER_ID_RYAN: ${{ secrets.ADMIN_USER_ID_RYAN }}
+          ADMIN_USER_ID_PARCEIRO: ${{ secrets.ADMIN_USER_ID_PARCEIRO }}
           # Qase TMS
           QASE_TESTOPS_API_TOKEN: ${{ secrets.QASE_TESTOPS_API_TOKEN }}
           QASE_TESTOPS_PROJECT: ${{ secrets.QASE_TESTOPS_PROJECT }}

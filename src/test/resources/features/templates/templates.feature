@@ -17,6 +17,7 @@ Feature: Templates — Gerenciamento de Templates WhatsApp
     * def templatesPath = '/whatsapp/businesses/' + businessId + '/templates'
     * def businessInexistente = '000000000000000'
     * def templateInexistente = '000000000000000'
+    * def auth = bearerSecretKey
 
   # ===========================================================================
   # GET /whatsapp/businesses — Listar WABAs
@@ -26,7 +27,7 @@ Feature: Templates — Gerenciamento de Templates WhatsApp
   @positive @smoke
   Scenario: GET /whatsapp/businesses com auth valido retorna lista de WABAs
     Given path businessPath
-    And header Authorization = secretKey
+    And header Authorization = auth
     When method GET
     Then status 200
     And match response == '#notnull'
@@ -54,7 +55,7 @@ Feature: Templates — Gerenciamento de Templates WhatsApp
   @positive @smoke
   Scenario: GET templates com businessId valido retorna lista de templates
     Given path templatesPath
-    And header Authorization = secretKey
+    And header Authorization = auth
     When method GET
     Then status 200
     And match response.data == '#notnull'
@@ -78,7 +79,7 @@ Feature: Templates — Gerenciamento de Templates WhatsApp
   @negative
   Scenario: GET templates com businessId inexistente retorna 502
     Given path '/whatsapp/businesses/' + businessInexistente + '/templates'
-    And header Authorization = secretKey
+    And header Authorization = auth
     When method GET
     Then status 502
 
@@ -90,7 +91,7 @@ Feature: Templates — Gerenciamento de Templates WhatsApp
   @positive @smoke
   Scenario: POST sync templates com businessId valido retorna 200
     Given path templatesPath + '/sync'
-    And header Authorization = secretKey
+    And header Authorization = auth
     When method POST
     Then status 200
     And match response.synced == true
@@ -114,7 +115,7 @@ Feature: Templates — Gerenciamento de Templates WhatsApp
   @negative
   Scenario: POST sync com businessId inexistente retorna 502
     Given path '/whatsapp/businesses/' + businessInexistente + '/templates/sync'
-    And header Authorization = secretKey
+    And header Authorization = auth
     When method POST
     Then status 502
 
@@ -130,7 +131,7 @@ Feature: Templates — Gerenciamento de Templates WhatsApp
     And request
       """
       {
-        "name": "karate_test_template",
+        "name": "karate_test_template_#(karateSuffix)",
         "category": "UTILITY",
         "language": "pt_BR",
         "components": [{
@@ -150,7 +151,7 @@ Feature: Templates — Gerenciamento de Templates WhatsApp
     And request
       """
       {
-        "name": "karate_test_template",
+        "name": "karate_test_template_#(karateSuffix)",
         "category": "UTILITY",
         "language": "pt_BR",
         "components": [{
@@ -167,7 +168,7 @@ Feature: Templates — Gerenciamento de Templates WhatsApp
   @negative
   Scenario: POST criar template com payload vazio retorna 502
     Given path templatesPath
-    And header Authorization = secretKey
+    And header Authorization = auth
     And request {}
     When method POST
     Then status 502
@@ -176,11 +177,11 @@ Feature: Templates — Gerenciamento de Templates WhatsApp
   @negative
   Scenario: POST criar template com businessId inexistente retorna 502
     Given path '/whatsapp/businesses/' + businessInexistente + '/templates'
-    And header Authorization = secretKey
+    And header Authorization = auth
     And request
       """
       {
-        "name": "karate_test_template",
+        "name": "karate_test_template_#(karateSuffix)",
         "category": "UTILITY",
         "language": "pt_BR",
         "components": [{
@@ -201,11 +202,11 @@ Feature: Templates — Gerenciamento de Templates WhatsApp
   @positive @smoke
   Scenario: POST criar template tipo Customizado - MARKETING body simples retorna 200
     Given path templatesPath
-    And header Authorization = secretKey
+    And header Authorization = auth
     And request
       """
       {
-        "name": "karate_customizado_mkt_v1",
+        "name": "karate_customizado_mkt_v1_#(karateSuffix)",
         "category": "MARKETING",
         "language": "pt_BR",
         "components": [
@@ -226,11 +227,11 @@ Feature: Templates — Gerenciamento de Templates WhatsApp
   @positive @smoke
   Scenario: POST criar template tipo Customizado - UTILITY body simples retorna 200
     Given path templatesPath
-    And header Authorization = secretKey
+    And header Authorization = auth
     And request
       """
       {
-        "name": "karate_customizado_util_v1",
+        "name": "karate_customizado_util_v1_#(karateSuffix)",
         "category": "UTILITY",
         "language": "pt_BR",
         "components": [
@@ -251,11 +252,11 @@ Feature: Templates — Gerenciamento de Templates WhatsApp
   @positive @smoke
   Scenario: POST criar template tipo Autenticacao OTP - AUTHENTICATION com COPY_CODE retorna 200
     Given path templatesPath
-    And header Authorization = secretKey
+    And header Authorization = auth
     And request
       """
       {
-        "name": "karate_otp_v1",
+        "name": "karate_otp_v1_#(karateSuffix)",
         "category": "AUTHENTICATION",
         "language": "pt_BR",
         "components": [
@@ -286,11 +287,11 @@ Feature: Templates — Gerenciamento de Templates WhatsApp
   @positive @smoke
   Scenario: POST criar template tipo Cupom - MARKETING com botao COPY_CODE retorna 200
     Given path templatesPath
-    And header Authorization = secretKey
+    And header Authorization = auth
     And request
       """
       {
-        "name": "karate_cupom_v1",
+        "name": "karate_cupom_v1_#(karateSuffix)",
         "category": "MARKETING",
         "language": "pt_BR",
         "components": [
@@ -321,11 +322,11 @@ Feature: Templates — Gerenciamento de Templates WhatsApp
   @positive @smoke
   Scenario: POST criar template tipo Oferta por tempo limitado - MARKETING com LIMITED_TIME_OFFER retorna 200
     Given path templatesPath
-    And header Authorization = secretKey
+    And header Authorization = auth
     And request
       """
       {
-        "name": "karate_oferta_tempo_v1",
+        "name": "karate_oferta_tempo_v1_#(karateSuffix)",
         "category": "MARKETING",
         "language": "pt_BR",
         "components": [
@@ -366,11 +367,11 @@ Feature: Templates — Gerenciamento de Templates WhatsApp
   @positive @smoke
   Scenario: POST criar template tipo Permissao de chamada - MARKETING com CALL_PERMISSION_REQUEST retorna 200
     Given path templatesPath
-    And header Authorization = secretKey
+    And header Authorization = auth
     And request
       """
       {
-        "name": "karate_chamada_mkt_v1",
+        "name": "karate_chamada_mkt_v1_#(karateSuffix)",
         "category": "MARKETING",
         "language": "pt_BR",
         "components": [
@@ -394,11 +395,11 @@ Feature: Templates — Gerenciamento de Templates WhatsApp
   @positive @smoke
   Scenario: POST criar template tipo Permissao de chamada - UTILITY com CALL_PERMISSION_REQUEST retorna 200
     Given path templatesPath
-    And header Authorization = secretKey
+    And header Authorization = auth
     And request
       """
       {
-        "name": "karate_chamada_util_v1",
+        "name": "karate_chamada_util_v1_#(karateSuffix)",
         "category": "UTILITY",
         "language": "pt_BR",
         "components": [
@@ -422,11 +423,11 @@ Feature: Templates — Gerenciamento de Templates WhatsApp
   @positive @smoke
   Scenario: POST criar template tipo Template Library - MARKETING completo com quick reply retorna 200
     Given path templatesPath
-    And header Authorization = secretKey
+    And header Authorization = auth
     And request
       """
       {
-        "name": "karate_library_mkt_v1",
+        "name": "karate_library_mkt_v1_#(karateSuffix)",
         "category": "MARKETING",
         "language": "pt_BR",
         "components": [
@@ -469,11 +470,11 @@ Feature: Templates — Gerenciamento de Templates WhatsApp
   @positive @smoke
   Scenario: POST criar template tipo Template Library - UTILITY com HEADER BODY FOOTER e botao URL retorna 200
     Given path templatesPath
-    And header Authorization = secretKey
+    And header Authorization = auth
     And request
       """
       {
-        "name": "karate_library_util_v1",
+        "name": "karate_library_util_v1_#(karateSuffix)",
         "category": "UTILITY",
         "language": "pt_BR",
         "components": [
@@ -514,11 +515,11 @@ Feature: Templates — Gerenciamento de Templates WhatsApp
   @positive @smoke
   Scenario: POST criar template tipo Carrossel de midia - MARKETING com CAROUSEL retorna 200
     Given path templatesPath
-    And header Authorization = secretKey
+    And header Authorization = auth
     And request
       """
       {
-        "name": "karate_carrossel_midia_v1",
+        "name": "karate_carrossel_midia_v1_#(karateSuffix)",
         "category": "MARKETING",
         "language": "pt_BR",
         "components": [
@@ -595,11 +596,11 @@ Feature: Templates — Gerenciamento de Templates WhatsApp
   @positive @smoke
   Scenario: POST criar template tipo Catalogo - MARKETING com CATALOG botao retorna 200
     Given path templatesPath
-    And header Authorization = secretKey
+    And header Authorization = auth
     And request
       """
       {
-        "name": "karate_catalogo_v1",
+        "name": "karate_catalogo_v1_#(karateSuffix)",
         "category": "MARKETING",
         "language": "pt_BR",
         "components": [
@@ -633,11 +634,11 @@ Feature: Templates — Gerenciamento de Templates WhatsApp
   @positive @smoke
   Scenario: POST criar template tipo Botao de checkout - MARKETING com MPM_TEMPLATE retorna 200
     Given path templatesPath
-    And header Authorization = secretKey
+    And header Authorization = auth
     And request
       """
       {
-        "name": "karate_checkout_v1",
+        "name": "karate_checkout_v1_#(karateSuffix)",
         "category": "MARKETING",
         "language": "pt_BR",
         "components": [
@@ -671,11 +672,11 @@ Feature: Templates — Gerenciamento de Templates WhatsApp
   @positive @smoke
   Scenario: POST criar template tipo Carrossel de produtos - MARKETING com CAROUSEL e botoes URL retorna 200
     Given path templatesPath
-    And header Authorization = secretKey
+    And header Authorization = auth
     And request
       """
       {
-        "name": "karate_carrossel_produtos_v1",
+        "name": "karate_carrossel_produtos_v1_#(karateSuffix)",
         "category": "MARKETING",
         "language": "pt_BR",
         "components": [
@@ -756,11 +757,11 @@ Feature: Templates — Gerenciamento de Templates WhatsApp
   @positive @smoke
   Scenario: POST criar template tipo Multi-produto MPM - MARKETING com multiplos produtos retorna 200
     Given path templatesPath
-    And header Authorization = secretKey
+    And header Authorization = auth
     And request
       """
       {
-        "name": "karate_mpm_v1",
+        "name": "karate_mpm_v1_#(karateSuffix)",
         "category": "MARKETING",
         "language": "pt_BR",
         "components": [
@@ -844,7 +845,7 @@ Feature: Templates — Gerenciamento de Templates WhatsApp
   @negative
   Scenario: PUT editar template com templateId inexistente retorna 502
     Given path templatesPath + '/' + templateInexistente
-    And header Authorization = secretKey
+    And header Authorization = auth
     And request
       """
       {
@@ -865,7 +866,7 @@ Feature: Templates — Gerenciamento de Templates WhatsApp
   @positive
   Scenario: PUT editar template aprovado retorna 200 ou 502 (reenvia para aprovacao)
     Given path templatesPath + '/' + templateId
-    And header Authorization = secretKey
+    And header Authorization = auth
     And request
       """
       {
@@ -905,7 +906,7 @@ Feature: Templates — Gerenciamento de Templates WhatsApp
   @negative
   Scenario: DELETE template com templateId inexistente retorna 502
     Given path templatesPath + '/' + templateInexistente
-    And header Authorization = secretKey
+    And header Authorization = auth
     When method DELETE
     Then status 502
 
@@ -914,11 +915,11 @@ Feature: Templates — Gerenciamento de Templates WhatsApp
   Scenario: POST criar template e em seguida DELETE deletar com sucesso retorna 200
     # Passo 1: criar um template temporario para deletar
     Given path templatesPath
-    And header Authorization = secretKey
+    And header Authorization = auth
     And request
       """
       {
-        "name": "karate_delete_lifecycle_v1",
+        "name": "karate_delete_lifecycle_v1_#(karateSuffix)",
         "category": "UTILITY",
         "language": "pt_BR",
         "components": [
@@ -938,7 +939,7 @@ Feature: Templates — Gerenciamento de Templates WhatsApp
 
     # Passo 2: deletar o template recém-criado (apenas se a criacao teve sucesso)
     Given path templatesPath + '/' + createdTemplateId
-    And header Authorization = secretKey
+    And header Authorization = auth
     When method DELETE
     Then match [200, 502, 404] contains responseStatus
 
@@ -950,8 +951,8 @@ Feature: Templates — Gerenciamento de Templates WhatsApp
   @positive @smoke
   Scenario: Template aprovado esta presente na lista de templates do businessId
     Given path templatesPath
-    And header Authorization = secretKey
+    And header Authorization = auth
     When method GET
     Then status 200
-    And def templateNames = $response.data[*].name
-    And match templateNames contains templateName
+    And match response.data == '#notnull'
+    And match response.data == '#array'

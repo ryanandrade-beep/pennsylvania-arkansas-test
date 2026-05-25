@@ -50,6 +50,11 @@ function fn() {
   var businessId        = envOrDefault('BUSINESS_ID',         'CONFIGURE_NO_ENV');
   var templateId        = envOrDefault('TEMPLATE_ID',         'CONFIGURE_NO_ENV');
   var templateName      = envOrDefault('TEMPLATE_NAME',       'teste_1');
+  var adminUserIdRyan   = envOrDefault('ADMIN_USER_ID_RYAN',  'CONFIGURE_NO_ENV');
+  var adminUserIdParceiro = envOrDefault('ADMIN_USER_ID_PARCEIRO', 'CONFIGURE_NO_ENV');
+
+  // ── Sufixo unico por execucao para nomes de templates (evita conflito de nomes duplicados)
+  var karateSuffix = java.lang.System.currentTimeMillis() + '';
 
   // ── Variaveis derivadas ──────────────────────────────────────────────────────
   var bearerSecretKey = 'Bearer ' + secretKey;
@@ -88,6 +93,14 @@ function fn() {
     businessId:           businessId,
     templateId:           templateId,
     templateName:         templateName,
+
+    // IDs de usuarios para testes de admin (apenas Ryan e Parceiro)
+    adminUserIdRyan:      adminUserIdRyan,
+    adminUserIdParceiro:  adminUserIdParceiro,
+
+    // Sufixo unico por execucao — usar em nomes de templates para evitar duplicados
+    // Exemplo de uso nos feature files: "karate_test_" + karateSuffix
+    karateSuffix:         karateSuffix,
 
     // Constantes de teste
     ID_INEXISTENTE:       '00000000-0000-0000-0000-000000000000',

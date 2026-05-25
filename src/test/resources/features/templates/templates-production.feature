@@ -1,4 +1,4 @@
-@templates @production @regression
+@templates @regression
 Feature: Templates Production — Cenarios para WABA 1268883528007780
 
   Testa criacao de templates WhatsApp Business via API HubMessage
@@ -20,7 +20,7 @@ Feature: Templates Production — Cenarios para WABA 1268883528007780
 
   Background:
     * url baseUrl
-    * def prodBusinessId = '1387002032569151'
+    * def prodBusinessId = '993644263088265'
     * def prodTemplatesPath = '/whatsapp/businesses/' + prodBusinessId + '/templates'
     * def templateInexistente = '000000000000000'
 
@@ -63,7 +63,7 @@ Feature: Templates Production — Cenarios para WABA 1268883528007780
     And request
       """
       {
-        "name": "prod_header_image_mkt_v1",
+        "name": "prod_header_image_mkt_v1_#(karateSuffix)",
         "category": "MARKETING",
         "language": "pt_BR",
         "components": [
@@ -112,7 +112,7 @@ Feature: Templates Production — Cenarios para WABA 1268883528007780
     And request
       """
       {
-        "name": "prod_header_image_util_v1",
+        "name": "prod_header_image_util_v1_#(karateSuffix)",
         "category": "UTILITY",
         "language": "pt_BR",
         "components": [
@@ -159,7 +159,7 @@ Feature: Templates Production — Cenarios para WABA 1268883528007780
     And request
       """
       {
-        "name": "prod_header_video_mkt_v1",
+        "name": "prod_header_video_mkt_v1_#(karateSuffix)",
         "category": "MARKETING",
         "language": "pt_BR",
         "components": [
@@ -208,7 +208,7 @@ Feature: Templates Production — Cenarios para WABA 1268883528007780
     And request
       """
       {
-        "name": "prod_header_document_util_v1",
+        "name": "prod_header_document_util_v1_#(karateSuffix)",
         "category": "UTILITY",
         "language": "pt_BR",
         "components": [
@@ -248,7 +248,7 @@ Feature: Templates Production — Cenarios para WABA 1268883528007780
     And request
       """
       {
-        "name": "prod_phone_button_mkt_v1",
+        "name": "prod_phone_button_mkt_v1_#(karateSuffix)",
         "category": "MARKETING",
         "language": "pt_BR",
         "components": [
@@ -283,7 +283,7 @@ Feature: Templates Production — Cenarios para WABA 1268883528007780
     And request
       """
       {
-        "name": "prod_phone_button_util_v1",
+        "name": "prod_phone_button_util_v1_#(karateSuffix)",
         "category": "UTILITY",
         "language": "pt_BR",
         "components": [
@@ -322,7 +322,7 @@ Feature: Templates Production — Cenarios para WABA 1268883528007780
     And request
       """
       {
-        "name": "prod_mixed_buttons_mkt_v1",
+        "name": "prod_mixed_buttons_mkt_v1_#(karateSuffix)",
         "category": "MARKETING",
         "language": "pt_BR",
         "components": [
@@ -376,7 +376,7 @@ Feature: Templates Production — Cenarios para WABA 1268883528007780
     And request
       """
       {
-        "name": "prod_url_phone_util_v1",
+        "name": "prod_url_phone_util_v1_#(karateSuffix)",
         "category": "UTILITY",
         "language": "pt_BR",
         "components": [
@@ -421,7 +421,7 @@ Feature: Templates Production — Cenarios para WABA 1268883528007780
     And request
       """
       {
-        "name": "prod_otp_zerotap_v1",
+        "name": "prod_otp_zerotap_v1_#(karateSuffix)",
         "category": "AUTHENTICATION",
         "language": "pt_BR",
         "components": [
@@ -462,7 +462,7 @@ Feature: Templates Production — Cenarios para WABA 1268883528007780
     And request
       """
       {
-        "name": "prod_otp_onetap_v1",
+        "name": "prod_otp_onetap_v1_#(karateSuffix)",
         "category": "AUTHENTICATION",
         "language": "pt_BR",
         "components": [
@@ -502,7 +502,7 @@ Feature: Templates Production — Cenarios para WABA 1268883528007780
     And request
       """
       {
-        "name": "prod_header_var_mkt_v1",
+        "name": "prod_header_var_mkt_v1_#(karateSuffix)",
         "category": "MARKETING",
         "language": "pt_BR",
         "components": [
@@ -558,7 +558,7 @@ Feature: Templates Production — Cenarios para WABA 1268883528007780
     And request
       """
       {
-        "name": "prod_carrossel_video_mkt_v1",
+        "name": "prod_carrossel_video_mkt_v1_#(karateSuffix)",
         "category": "MARKETING",
         "language": "pt_BR",
         "components": [
@@ -643,7 +643,7 @@ Feature: Templates Production — Cenarios para WABA 1268883528007780
     And request
       """
       {
-        "name": "prod_carrossel_misto_v1",
+        "name": "prod_carrossel_misto_v1_#(karateSuffix)",
         "category": "MARKETING",
         "language": "pt_BR",
         "components": [
@@ -732,7 +732,7 @@ Feature: Templates Production — Cenarios para WABA 1268883528007780
     And request
       """
       {
-        "name": "prod_only_body_mkt_v1",
+        "name": "prod_only_body_mkt_v1_#(karateSuffix)",
         "category": "MARKETING",
         "language": "pt_BR",
         "components": [
@@ -757,7 +757,7 @@ Feature: Templates Production — Cenarios para WABA 1268883528007780
     And request
       """
       {
-        "name": "prod_only_body_util_v1",
+        "name": "prod_only_body_util_v1_#(karateSuffix)",
         "category": "UTILITY",
         "language": "pt_BR",
         "components": [
@@ -786,7 +786,7 @@ Feature: Templates Production — Cenarios para WABA 1268883528007780
     And request
       """
       {
-        "name": "prod_cupom_image_mkt_v1",
+        "name": "prod_cupom_image_mkt_v1_#(karateSuffix)",
         "category": "MARKETING",
         "language": "pt_BR",
         "components": [
@@ -836,7 +836,7 @@ Feature: Templates Production — Cenarios para WABA 1268883528007780
     And request
       """
       {
-        "name": "prod_lto_image_mkt_v1",
+        "name": "prod_lto_image_mkt_v1_#(karateSuffix)",
         "category": "MARKETING",
         "language": "pt_BR",
         "components": [
@@ -938,7 +938,7 @@ Feature: Templates Production — Cenarios para WABA 1268883528007780
     And request
       """
       {
-        "name": "prod_sem_category_v1",
+        "name": "prod_sem_category_v1_#(karateSuffix)",
         "language": "pt_BR",
         "components": [
           {
@@ -959,7 +959,7 @@ Feature: Templates Production — Cenarios para WABA 1268883528007780
     And request
       """
       {
-        "name": "prod_sem_language_v1",
+        "name": "prod_sem_language_v1_#(karateSuffix)",
         "category": "MARKETING",
         "components": [
           {
@@ -980,7 +980,7 @@ Feature: Templates Production — Cenarios para WABA 1268883528007780
     And request
       """
       {
-        "name": "prod_cat_invalida_v1",
+        "name": "prod_cat_invalida_v1_#(karateSuffix)",
         "category": "INVALIDA",
         "language": "pt_BR",
         "components": [
@@ -1002,7 +1002,7 @@ Feature: Templates Production — Cenarios para WABA 1268883528007780
     And request
       """
       {
-        "name": "prod_components_vazios_v1",
+        "name": "prod_components_vazios_v1_#(karateSuffix)",
         "category": "MARKETING",
         "language": "pt_BR",
         "components": []
@@ -1024,7 +1024,7 @@ Feature: Templates Production — Cenarios para WABA 1268883528007780
     And request
       """
       {
-        "name": "prod_delete_lifecycle_v1",
+        "name": "prod_delete_lifecycle_v1_#(karateSuffix)",
         "category": "UTILITY",
         "language": "pt_BR",
         "components": [
