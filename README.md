@@ -1,4 +1,4 @@
-# Pennsylvania Arkansas Test — Automação de API
+# Pennsylvania Test — Automação de API
 
 Suite de testes automatizados de API para a plataforma **HubMessage** (microserviços Arkansas).
 Utiliza **Karate DSL 1.4.1** com **JUnit 5**, integrado ao **Qase TMS**.
