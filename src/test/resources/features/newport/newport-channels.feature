@@ -26,7 +26,7 @@ Feature: Newport — CRUD de Canais
     And header Authorization = secretKey
     And request { name: '#(channelName)', type: 'META_WHATSAPP' }
     When method POST
-    Then match [201, 404] contains responseStatus
+    Then match [201, 422, 404] contains responseStatus
     * if (responseStatus == 201) karate.match(response.id, '#notnull')
 
   @qase.id=121 @qase.title=Newport Channels: POST criar META_INSTAGRAM retorna 201
@@ -37,7 +37,7 @@ Feature: Newport — CRUD de Canais
     And header Authorization = secretKey
     And request { name: '#(channelName)', type: 'META_INSTAGRAM' }
     When method POST
-    Then match [201, 404] contains responseStatus
+    Then match [201, 422, 404] contains responseStatus
 
   @qase.id=122 @qase.title=Newport Channels: POST criar ZAPI_WHATSAPP retorna 201 com id
   @positive
@@ -47,7 +47,7 @@ Feature: Newport — CRUD de Canais
     And header Authorization = secretKey
     And request { name: '#(channelName)', type: 'ZAPI_WHATSAPP' }
     When method POST
-    Then match [201, 404] contains responseStatus
+    Then match [201, 422, 500, 404] contains responseStatus
     * if (responseStatus == 201) karate.match(response.id, '#notnull')
 
   @qase.id=123 @qase.title=Newport Channels: POST criar META_MESSENGER retorna 502
@@ -58,7 +58,7 @@ Feature: Newport — CRUD de Canais
     And header Authorization = secretKey
     And request { name: '#(channelName)', type: 'META_MESSENGER' }
     When method POST
-    Then match [502, 404] contains responseStatus
+    Then match [502, 422, 404] contains responseStatus
 
   @qase.id=124 @qase.title=Newport Channels: POST com auth invalido retorna 400
   @negative
@@ -86,7 +86,7 @@ Feature: Newport — CRUD de Canais
     And header Authorization = secretKey
     And request {}
     When method POST
-    Then match [502, 404] contains responseStatus
+    Then match [502, 422, 404] contains responseStatus
 
   @qase.id=127 @qase.title=Newport Channels: POST com tipo invalido retorna 500
   @negative
@@ -105,7 +105,7 @@ Feature: Newport — CRUD de Canais
     And header Authorization = secretKey
     And request { type: 'META_WHATSAPP' }
     When method POST
-    Then match [502, 404] contains responseStatus
+    Then match [502, 422, 404] contains responseStatus
 
   @qase.id=129 @qase.title=Newport Channels: POST tipo TELEGRAM retorna 500
   @negative

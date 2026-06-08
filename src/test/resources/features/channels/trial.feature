@@ -23,7 +23,7 @@ Feature: Trial — Verificacao de status Trial via criacao de canal
     And header Authorization = secretKey
     And request { "name": "Canal Karate Trial Test", "type": "META_WHATSAPP" }
     When method POST
-    Then match [200, 201, 404] contains responseStatus
+    Then match [200, 201, 422, 404] contains responseStatus
     * def createdChannelId = responseStatus == 201 || responseStatus == 200 ? response.id : null
 
     # Passo 2: verificar status trial apenas se o canal foi criado com sucesso

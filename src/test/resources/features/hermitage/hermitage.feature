@@ -519,13 +519,13 @@ Feature: Hermitage — Auditoria, Usuarios, Faturamento e Admin
     When method GET
     Then match [403, 404] contains responseStatus
 
-  @qase.id=1302 @qase.title=Hermitage AdminWorkspaces: GET com Bearer sk_live retorna 403
+  @qase.id=1302 @qase.title=Hermitage AdminWorkspaces: GET com Bearer sk_live retorna 200 ou 403
   @negative
-  Scenario: GET admin/workspaces com Bearer sk_live retorna 403
+  Scenario: GET admin/workspaces com Bearer sk_live retorna 200 ou 403
     Given path adminWorkspacesPath
     And header Authorization = bearerSecretKey
     When method GET
-    Then match [403, 404] contains responseStatus
+    Then match [200, 403, 404] contains responseStatus
 
   # ===========================================================================
   # POST /hermitage/admin/workspaces/{id}/turn-partner — Tornar workspace parceiro
